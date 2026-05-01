@@ -119,6 +119,10 @@ body { background:#f4f6f9; }
 <i class="bi bi-bar-chart"></i> Reports
 </a>
 
+<a href="{{ route('attendance.index') }}">
+<i class="bi bi-calendar-check"></i> Attendance
+</a>
+
 @endif
 
 <a href="{{ route('profile.edit') }}">

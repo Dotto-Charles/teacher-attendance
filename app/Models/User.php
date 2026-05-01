@@ -57,7 +57,10 @@ class User extends Authenticatable
     }
 
     
-
+        public function council()
+{
+    return $this->belongsTo(\App\Models\Council::class);
+}
     /*
     |--------------------------------------------------------------------------
     | ACCESSORS (PROFESSIONAL)
@@ -104,5 +107,15 @@ class User extends Authenticatable
     public function getAuthIdentifierName()
 {
     return 'check_number';
+}
+
+public function ward()
+{
+    return $this->belongsTo(Ward::class);
+}
+
+public function attendances()
+{
+    return $this->hasMany(\App\Models\Attendance::class);
 }
 }

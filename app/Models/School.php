@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class School extends Model
 {
     protected $fillable = [
@@ -15,4 +15,9 @@ class School extends Model
     'radius',
     
 ];
+
+public function ward(): BelongsTo
+{
+    return $this->belongsTo(Ward::class);
+}
 }

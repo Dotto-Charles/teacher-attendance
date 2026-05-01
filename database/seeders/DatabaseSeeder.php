@@ -17,8 +17,10 @@ class DatabaseSeeder extends Seeder
 {
     $this->call([
         
+        CouncilSeeder::class,
         WardSeeder::class,
         DalaiSchoolSeeder::class,
+        MondoSchoolSeeder::class,
         UserSeeder::class, 
 
          

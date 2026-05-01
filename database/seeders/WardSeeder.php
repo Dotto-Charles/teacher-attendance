@@ -3,18 +3,12 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Ward;
-use App\Models\Council;
+use Illuminate\Support\Facades\DB;
 
 class WardSeeder extends Seeder
 {
     public function run(): void
     {
-        // Hakikisha council ya Chemba ipo
-        $council = Council::firstOrCreate([
-            'name' => 'Chemba District Council'
-        ]);
-
         $wards = [
             'Chandama',
             'Chemba',
@@ -43,9 +37,11 @@ class WardSeeder extends Seeder
         ];
 
         foreach ($wards as $ward) {
-            Ward::firstOrCreate([
+            DB::table('wards')->insert([
                 'name' => $ward,
-                'council_id' => $council->id
+                'council_id' => 1, // Chemba DC
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }
