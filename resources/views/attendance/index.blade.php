@@ -1,4 +1,4 @@
-<x-layout>
+<x-layout title="Mahudhurio">
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
 

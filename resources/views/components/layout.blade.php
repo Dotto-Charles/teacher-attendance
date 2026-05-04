@@ -1,82 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
 <meta charset="UTF-8">
-<title>{{ config('app.name') }}</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ $title ?? config('app.name') }} · EduAttend</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-body { background:#f4f6f9; }
+:root{
+    --primary:#6366f1;
+    --primary2:#4f46e5;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --radius:16px;
+}
 
-/* Sidebar */
-.sidebar {
-    width:250px;
-    height:100vh;
+body{
+    margin:0;
+    font-family:system-ui, -apple-system, sans-serif;
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+}
+
+/* SIDEBAR */
+.sidebar{
     position:fixed;
-    background:#0d6efd;
+    top:0;left:0;bottom:0;
+    width:250px;
+    background:linear-gradient(180deg,var(--primary),var(--primary2));
     color:white;
-    padding-top:20px;
-    transition:0.3s;
-}
-
-/* Hidden sidebar mobile */
-.sidebar.hide {
-    margin-left:-250px;
-}
-
-.sidebar a {
-    color:white;
-    display:block;
-    padding:12px 20px;
-    text-decoration:none;
-}
-
-.sidebar a:hover {
-    background:rgba(255,255,255,0.2);
-}
-
-.main {
-    margin-left:250px;
     padding:20px;
-    transition:0.3s;
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+    z-index:1000;
 }
 
-.main.full {
-    margin-left:0;
+.brand{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:25px;
 }
 
-/* Topbar */
-.topbar {
-    background:white;
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:10px;
     padding:10px;
     border-radius:10px;
+    color:#e0e7ff;
+    text-decoration:none;
+    margin-bottom:5px;
+}
+
+.nav a:hover{
+    background:rgba(255,255,255,.15);
+    color:white;
+}
+
+.nav a.active{
+    background:white;
+    color:var(--primary);
+    font-weight:600;
+}
+
+/* MAIN */
+.main{
+    margin-left:250px;
+    padding:20px;
+}
+
+/* TOPBAR */
+.topbar{
+    background:rgba(255,255,255,.7);
+    backdrop-filter:blur(10px);
+    padding:12px 20px;
+    border-radius:var(--radius);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     margin-bottom:20px;
 }
 
-/* Mobile */
-@media(max-width:768px){
-    .sidebar {
-        margin-left:-250px;
-    }
-    .sidebar.show {
-        margin-left:0;
-    }
-    .main {
-        margin-left:0;
-    }
+/* CARD */
+.card-ui{
+    background:white;
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.05);
 }
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
 
-    .main {
-        margin-left: 0;
+/* MOBILE */
+.hamburger{
+    display:none;
+    font-size:22px;
+    background:none;
+    border:none;
+}
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+}
+
+@media(max-width:991px){
+    .sidebar{
+        transform:translateX(-100%);
+    }
+    .sidebar.show{
+        transform:translateX(0);
+    }
+    .main{
+        margin-left:0;
+    }
+    .hamburger{
+        display:block;
+    }
+    .overlay.show{
+        display:block;
     }
 }
 </style>
@@ -84,97 +131,88 @@ body { background:#f4f6f9; }
 
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar" class="sidebar">
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-<h4 class="text-center">🏫 Attendance</h4>
-<hr>
+{{-- SIDEBAR --}}
+<div class="sidebar" id="sidebar">
 
-<a href="{{ route('dashboard') }}"><i class="bi bi-house"></i> Dashboard</a>
+<div class="brand">🏫 EduAttend</div>
 
-@if(auth()->user()->role === 'teacher')
+<div class="nav">
+
+<a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard')?'active':'' }}">
+<i class="bi bi-house"></i> Dashboard
+</a>
 
 <a href="{{ route('attendance.index') }}">
-<i class="bi bi-calendar-check"></i> Attendance
+<i class="bi bi-check2-circle"></i> Attendance
 </a>
 
 <a href="{{ route('attendance.report') }}">
 <i class="bi bi-bar-chart"></i> Reports
 </a>
 
-@endif
-
-@if(auth()->user()->role === 'head_teacher')
-
-<a href="{{ route('approvals.index') }}">
-<i class="bi bi-check-circle"></i> Approvals
+@if(auth()->user()->role=='teacher')
+<a href="{{ route('teacher.register.school') }}">
+<i class="bi bi-arrow-left-right"></i> Change School
 </a>
-<!-- SCHOOL REGISTRATION -->
-    <a href="{{ route('schools.create') }}"
-       class="{{ request()->routeIs('schools.create') ? 'active' : '' }}">
-        <i class="bi bi-building"></i> Register School
-    </a>
-
-<a href="{{ route('attendance.report') }}">
-<i class="bi bi-bar-chart"></i> Reports
-</a>
-
-<a href="{{ route('attendance.index') }}">
-<i class="bi bi-calendar-check"></i> Attendance
-</a>
-
 @endif
 
 <a href="{{ route('profile.edit') }}">
 <i class="bi bi-person"></i> Profile
 </a>
 
-@if(auth()->user()->role === 'teacher')
+</div>
 
-    <a href="{{ route('teacher.register.school') }}"
-       class="{{ request()->routeIs('teacher.register.school') ? 'active' : '' }}">
+<div style="margin-top:auto">
+<form method="POST" action="{{ route('logout') }}">
+@csrf
+<button class="btn btn-light w-100">Logout</button>
+</form>
+</div>
 
-        <i class="bi bi-arrow-left-right"></i>
+</div>
 
-        @if(auth()->user()->status === 'approved')
-            Transfer School
-        @else
-            Register School
-        @endif
+{{-- MAIN --}}
+<div class="main">
 
-    </a>
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:10px">
+<button class="hamburger" onclick="toggleSidebar()">
+<i class="bi bi-list"></i>
+</button>
+<strong>{{ $title }}</strong>
+</div>
 
+<div style="font-size:13px;color:gray">
+{{ now()->format('d M Y') }}
+</div>
+</div>
+
+{{-- FLASH --}}
+@if(session('success'))
+<div class="card-ui" style="background:#dcfce7;color:#166534">
+{{ session('success') }}
+</div>
 @endif
 
-<form method="POST" action="{{ route('logout') }}" class="px-3">
-@csrf
-<button class="btn btn-danger w-100 mt-3">Logout</button>
-</form>
-
+@if(session('error'))
+<div class="card-ui" style="background:#fee2e2;color:#991b1b">
+{{ session('error') }}
 </div>
+@endif
 
-<!-- MAIN -->
-<div id="main" class="main">
-
-<!-- TOPBAR -->
-<div class="topbar d-flex justify-content-between align-items-center">
-
-<button class="btn btn-primary d-md-none" onclick="toggleSidebar()">
-☰
-</button>
-
-<h5>Welcome, {{ auth()->user()->first_name }}</h5>
-
-</div>
-
+{{-- CONTENT --}}
+<div style="margin-top:15px">
 {{ $slot }}
+</div>
 
 </div>
 
 <script>
 function toggleSidebar(){
-    let sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('show');
+document.getElementById('sidebar').classList.toggle('show');
+document.getElementById('overlay').classList.toggle('show');
 }
 </script>
 

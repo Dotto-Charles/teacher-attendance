@@ -1,88 +1,113 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
+<x-layout title="Register School">
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-<div class="bg-white p-6 rounded-xl shadow w-full max-w-md">
+            <div class="card shadow-sm">
+                <div class="card-body">
 
-<h2 class="text-xl font-bold mb-4 text-center">
-    {{ auth()->user()->status == 'approved' ? '🔄 Transfer School' : '🏫 Register School' }}
-</h2>
+                    <h5 class="fw-bold mb-3 text-center">
+                        🏫 Register / Transfer School
+                    </h5>
 
-@if(session('success'))
-<div class="bg-green-100 p-3 mb-3 rounded">{{ session('success') }}</div>
-@endif
+                    {{-- ALERTS --}}
+                    @if(session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
 
-@if(session('error'))
-<div class="bg-red-100 p-3 mb-3 rounded">{{ session('error') }}</div>
-@endif
+                    @if(session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
 
-<form method="POST" action="{{ route('teacher.register.store') }}" class="space-y-4">
-@csrf
+                    <form method="POST" action="{{ route('teacher.register.store') }}">
+                        @csrf
 
-<!-- Council -->
-<select id="council" class="w-full p-3 border rounded">
-    <option value="">Select Council</option>
-    @foreach($councils as $c)
-        <option value="{{ $c->id }}">{{ $c->name }}</option>
-    @endforeach
-</select>
+                        {{-- COUNCIL --}}
+                        <div class="mb-3">
+                            <label class="form-label">Council</label>
+                            <select id="council" class="form-select">
+                                <option value="">-- Select Council --</option>
+                                @foreach($councils as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-<!-- Ward -->
-<select id="ward" class="w-full p-3 border rounded" disabled>
-    <option>Select Ward</option>
-</select>
+                        {{-- WARD --}}
+                        <div class="mb-3">
+                            <label class="form-label">Ward</label>
+                            <select id="ward" class="form-select">
+                                <option value="">-- Select Ward --</option>
+                            </select>
+                        </div>
 
-<!-- School -->
-<select id="school" name="school_id" class="w-full p-3 border rounded" disabled>
-    <option>Select School</option>
-</select>
+                        {{-- SCHOOL --}}
+                        <div class="mb-3">
+                            <label class="form-label">School</label>
+                            <select id="school" name="school_id" class="form-select" required>
+                                <option value="">-- Select School --</option>
+                            </select>
+                        </div>
 
-<button class="w-full bg-blue-600 text-white p-3 rounded">
-    Submit
-</button>
+                        <button class="btn btn-primary w-100">
+                            Submit
+                        </button>
 
-</form>
+                    </form>
 
-</div>
+                </div>
+            </div>
 
-<script>
+        </div>
+    </div>
 
-// LOAD WARDS
-document.getElementById('council').addEventListener('change', function () {
-    fetch(`/api/wards/${this.value}`)
-    .then(res => res.json())
-    .then(data => {
-        let ward = document.getElementById('ward');
-        ward.disabled = false;
-        ward.innerHTML = '<option>Select Ward</option>';
+    {{-- 🔥 ALL DATA LOADED ONCE --}}
+    <x-slot name="scripts">
+    <script>
 
-        data.forEach(w => {
-            ward.innerHTML += `<option value="${w.id}">${w.name}</option>`;
+        const WARDS = @json($wards);
+        const SCHOOLS = @json($schools);
+
+        const councilEl = document.getElementById('council');
+        const wardEl    = document.getElementById('ward');
+        const schoolEl  = document.getElementById('school');
+
+        // COUNCIL CHANGE
+        councilEl.addEventListener('change', function () {
+
+            let councilId = this.value;
+
+            wardEl.innerHTML = '<option value="">-- Select Ward --</option>';
+            schoolEl.innerHTML = '<option value="">-- Select School --</option>';
+
+            if (!councilId) return;
+
+            let filteredWards = WARDS.filter(w => w.council_id == councilId);
+
+            filteredWards.forEach(w => {
+                wardEl.innerHTML += `<option value="${w.id}">${w.name}</option>`;
+            });
+
         });
-    });
-});
 
-// LOAD SCHOOLS
-document.getElementById('ward').addEventListener('change', function () {
-    fetch(`/api/schools/${this.value}`)
-    .then(res => res.json())
-    .then(data => {
-        let school = document.getElementById('school');
-        school.disabled = false;
-        school.innerHTML = '<option>Select School</option>';
+        // WARD CHANGE
+        wardEl.addEventListener('change', function () {
 
-        data.forEach(s => {
-            school.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            let wardId = this.value;
+
+            schoolEl.innerHTML = '<option value="">-- Select School --</option>';
+
+            if (!wardId) return;
+
+            let filteredSchools = SCHOOLS.filter(s => s.ward_id == wardId);
+
+            filteredSchools.forEach(s => {
+                schoolEl.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
+
         });
-    });
-});
 
-</script>
+    </script>
+    </x-slot>
 
-</body>
-</html>
+</x-layout>

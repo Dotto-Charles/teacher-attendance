@@ -1,4 +1,4 @@
-```php
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -14,7 +14,10 @@ use App\Http\Controllers\District\DistrictDashboardController;
 use App\Http\Controllers\District\DistrictTeacherController;
 use App\Http\Controllers\District\DistrictSchoolController;
 use App\Http\Controllers\District\DistrictAttendanceController;
-
+use App\Http\Controllers\District\DistrictAssignmentController;
+use App\Http\Controllers\District\DistrictReportController;
+use App\Http\Controllers\Ward\WardOfficerController;
+use App\Http\Controllers\Teacher\TeacherDashboardController;
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -57,11 +60,16 @@ Route::middleware(['auth'])->group(function () {
     /*
     | ATTENDANCE (teacher, head_teacher, ward_officer)
     */
-    Route::middleware(['role:teacher,head_teacher,ward_officer'])->group(function () {
+    Route::middleware(['role:teacher,head_teacher'])->group(function () {
         Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
         Route::post('/attendance/check', [AttendanceController::class, 'check'])->name('attendance.check');
     });
 
+        Route::middleware(['auth'])->group(function () {
+    // Teacher check-in via AJAX
+    Route::post('/teacher/checkin', [TeacherDashboardController::class, 'checkIn'])
+        ->name('teacher.checkin');
+});
     /*
     | REPORTS
     */
@@ -83,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
     /*
     | APPROVALS (head_teacher, ward_officer)
     */
-    Route::middleware(['role:head_teacher,ward_officer'])->group(function () {
+    Route::middleware(['role:head_teacher'])->group(function () {
         Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
         Route::post('/approvals/{id}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
         Route::post('/approvals/{id}/reject', [ApprovalController::class, 'reject'])->name('approvals.reject');
@@ -154,6 +162,48 @@ Route::middleware(['auth', 'role:district_officer'])
         Route::get('/attendance/export/csv', [DistrictAttendanceController::class, 'exportCsv'])
             ->name('attendance.export.csv');
 
+            
+        // ── Assignments & Transfers ───────────────────────────────────
+        Route::get('/assignments', [DistrictAssignmentController::class, 'index'])
+            ->name('assignments.index');
+ 
+        // Ward Officer
+        Route::post('/assignments/assign-ward-officer', [DistrictAssignmentController::class, 'assignWardOfficer'])
+            ->name('assignments.assign-ward-officer');
+ 
+        Route::delete('/assignments/ward-officers/{user}/remove', [DistrictAssignmentController::class, 'removeWardOfficer'])
+            ->name('assignments.remove-ward-officer');
+ 
+        // Head Teacher
+        Route::post('/assignments/assign-head-teacher', [DistrictAssignmentController::class, 'assignHeadTeacher'])
+            ->name('assignments.assign-head-teacher');
+ 
+        Route::delete('/assignments/head-teachers/{user}/remove', [DistrictAssignmentController::class, 'removeHeadTeacher'])
+            ->name('assignments.remove-head-teacher');
+ 
+        // Transfers
+        Route::post('/assignments/transfers', [DistrictAssignmentController::class, 'requestTransfer'])
+            ->name('assignments.request-transfer');
+ 
+        Route::patch('/assignments/transfers/{transfer}/approve', [DistrictAssignmentController::class, 'approveTransfer'])
+            ->name('assignments.approve-transfer');
+ 
+        Route::patch('/assignments/transfers/{transfer}/reject', [DistrictAssignmentController::class, 'rejectTransfer'])
+            ->name('assignments.reject-transfer');
+
+             // INDEX (kuonyesha page ya reports)
+    Route::get('/reports', [DistrictReportController::class, 'index'])
+        ->name('reports.index');
+
+    // EXPORT CSV
+    Route::get('/reports/export/csv', [DistrictReportController::class, 'exportCsv'])
+        ->name('reports.export.csv');
+
+    // EXPORT PDF
+    Route::get('/reports/export/pdf', [DistrictReportController::class, 'exportPdf'])
+        ->name('reports.export.pdf');
+
+
         // AJAX - shule za kata
         Route::get('/schools-by-ward', function (\Illuminate\Http\Request $r) {
             return \App\Models\School::where('ward_id', $r->ward_id)
@@ -162,4 +212,62 @@ Route::middleware(['auth', 'role:district_officer'])
         })->name('schools.by.ward');
 
     });
+    
 
+Route::middleware(['auth', 'role:ward_officer'])
+    ->prefix('ward')
+    ->name('ward.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [WardOfficerController::class, 'dashboard'])
+            ->name('dashboard');
+
+        // Attendance
+        Route::get('/attendance', [WardOfficerController::class, 'attendanceIndex'])
+            ->name('attendance.index');
+
+        // Schools
+        Route::get('/schools', [WardOfficerController::class, 'schoolsIndex'])
+            ->name('schools.index');
+
+        // Teachers
+        Route::get('/teachers', [WardOfficerController::class, 'teachersIndex'])
+            ->name('teachers.index');
+
+        // Approvals
+        Route::get('/approvals', [WardOfficerController::class, 'approvalsIndex'])
+            ->name('approvals.index');
+
+        Route::patch('/approvals/{user}/approve', [WardOfficerController::class, 'approveTeacher'])
+            ->name('approvals.approve');
+
+        Route::patch('/approvals/{user}/reject', [WardOfficerController::class, 'rejectTeacher'])
+            ->name('approvals.reject');
+
+        // Transfers
+        Route::get('/transfers', [WardOfficerController::class, 'transfersIndex'])
+            ->name('transfers.index');
+
+        Route::post('/transfers/request', [WardOfficerController::class, 'requestTransfer'])
+            ->name('transfers.request');
+
+        // Reports
+        Route::get('/reports', [WardOfficerController::class, 'reportsIndex'])
+            ->name('reports.index');
+
+        Route::get('/reports/export/csv', [WardOfficerController::class, 'exportCsv'])
+            ->name('reports.export.csv');
+
+            Route::get('/attendance/export/csv', [WardOfficerController::class, 'exportAttendanceCsv'])
+    ->name('attendance.export.csv');
+
+    Route::get('/schools/{school}', [WardOfficerController::class, 'schoolShow'])
+    ->name('schools.show');
+
+    Route::get('/schools/{school}/export/pdf', [WardOfficerController::class, 'exportSchoolPdf'])
+    ->name('schools.export.pdf');
+
+    Route::get('/teachers/{user}/history', [WardOfficerController::class, 'teacherHistory'])
+    ->name('teachers.history');
+    });

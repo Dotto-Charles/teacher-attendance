@@ -37,7 +37,13 @@ class AuthenticatedSessionController extends Controller
     if (Auth::attempt($credentials, $request->boolean('remember'))) {
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+             $user = auth()->user();
+        return match($user->role) {
+    'ward_officer' => redirect()->route('ward.dashboard'),
+    'head_teacher' => redirect()->route('dashboard'),
+    'teacher'      => redirect()->route('dashboard'),
+    default        => redirect('/dashboard'),
+};
     }
 
     return back()->withErrors([

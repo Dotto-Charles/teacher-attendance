@@ -1,8 +1,8 @@
-<x-layout>
+<x-layout title="Ripoti">
 
 <div class="container-fluid">
 
-<h4 class="mb-4">📊 Attendance Report</h4>
+<h4 class="mb-4">📊 Ripoti ya Mahudhurio</h4>
 
 <!-- FILTER -->
 <form class="row g-2 mb-4">
@@ -11,13 +11,13 @@
 <input type="date" name="end" class="form-control col">
 
 <select name="month" class="form-control col">
-<option value="">Month</option>
+<option value="">Mwezi</option>
 @for($i=1;$i<=12;$i++)
 <option value="{{ $i }}">{{ $i }}</option>
 @endfor
 </select>
 
-<button class="btn btn-primary col">Filter</button>
+<button class="btn btn-primary col">Tafuta</button>
 
 </form>
 
@@ -33,7 +33,7 @@
 
 <div class="col-md-3">
 <div class="card p-3 text-center">
-<h6>This Month</h6>
+<h6>Mwezi Huu</h6>
 <h3>{{ $month }}</h3>
 </div>
 </div>
@@ -59,11 +59,11 @@
 <thead>
 <tr>
 @if(auth()->user()->role === 'head_teacher')
-<th>Teacher</th>
+<th>Mwalimu</th>
 @endif
-<th>Date</th>
-<th>Time</th>
-<th>Status</th>
+<th>Tarehe</th>
+<th>Muda</th>
+<th>Hali</th>
 </tr>
 </thead>
 
@@ -87,9 +87,9 @@ $late = $t->format('H:i') > '08:00';
 
 <td>
 @if($late)
-<span class="badge bg-danger">Late</span>
+<span class="badge bg-danger">Umechelewa</span>
 @else
-<span class="badge bg-success">On Time</span>
+<span class="badge bg-success">Umewahi</span>
 @endif
 </td>
 

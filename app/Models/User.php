@@ -21,13 +21,13 @@ use Illuminate\Notifications\Notifiable;
     'role',
     'status',
     'school_id',
+    'ward_id',
+    'council_id',
 ])]
-
 #[Hidden([
     'password',
     'remember_token',
 ])]
-
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -40,7 +40,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
@@ -50,40 +50,64 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    // 🏫 User belongs to school
+    // 🏫 Shule aliyopo
     public function school()
     {
         return $this->belongsTo(School::class);
     }
 
-    
-        public function council()
-{
-    return $this->belongsTo(\App\Models\Council::class);
-}
+    // 🗺️ Kata aliyopo (ward_officer)
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
+    }
+
+    // 🏛️ Halmashauri (district_officer)
+    public function council()
+    {
+        return $this->belongsTo(Council::class);
+    }
+
+    // 📅 Mahudhurio yake yote
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    // 🔄 Maombi ya uhamisho (kama mwalimu anayehamishwa)
+    public function transfers()
+    {
+        return $this->hasMany(Transfer::class, 'user_id');
+    }
+
+    // 📤 Maombi ya uhamisho aliyoomba (kama afisa)
+    public function requestedTransfers()
+    {
+        return $this->hasMany(Transfer::class, 'requested_by');
+    }
+
     /*
     |--------------------------------------------------------------------------
-    | ACCESSORS (PROFESSIONAL)
+    | ACCESSORS
     |--------------------------------------------------------------------------
     */
 
-    // 👤 Full Name
+    // 👤 Jina kamili
     public function getFullNameAttribute(): string
     {
         return trim(
             $this->first_name . ' ' .
-            $this->middle_name . ' ' .
+            ($this->middle_name ? $this->middle_name . ' ' : '') .
             $this->last_name
         );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | HELPERS (OPTIONAL BUT POWERFUL)
+    | HELPERS
     |--------------------------------------------------------------------------
     */
 
-    // Check roles
     public function isTeacher(): bool
     {
         return $this->role === 'teacher';
@@ -94,28 +118,28 @@ class User extends Authenticatable
         return $this->role === 'head_teacher';
     }
 
+    public function isWardOfficer(): bool
+    {
+        return $this->role === 'ward_officer';
+    }
+
+    public function isDistrictOfficer(): bool
+    {
+        return $this->role === 'district_officer';
+    }
+
     public function isOfficer(): bool
     {
         return in_array($this->role, ['ward_officer', 'district_officer']);
     }
 
-    // Approval status
     public function isApproved(): bool
     {
         return $this->status === 'approved';
     }
+
     public function getAuthIdentifierName()
-{
-    return 'check_number';
-}
-
-public function ward()
-{
-    return $this->belongsTo(Ward::class);
-}
-
-public function attendances()
-{
-    return $this->hasMany(\App\Models\Attendance::class);
-}
+    {
+        return 'check_number';
+    }
 }

@@ -21,9 +21,9 @@ class DashboardController extends Controller
         | TEACHER DASHBOARD
         |--------------------------------------------------------------------------
         */
-        if ($user->role === 'teacher') {
-            return view('dashboards.teacher');
-        }
+        if ($user->role === 'teacher' || $user->role === 'head_teacher') {
+    return (new \App\Http\Controllers\Teacher\TeacherDashboardController)->index($request);
+}
 
         /*
         |--------------------------------------------------------------------------
@@ -187,43 +187,9 @@ class DashboardController extends Controller
             ));
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | WARD OFFICER DASHBOARD
-        |--------------------------------------------------------------------------
-        */
-        if ($user->role === 'ward_officer') {
+        
+        
 
-            if (!$user->ward_id) {
-                abort(403, 'No ward assigned');
-            }
 
-            $schools   = School::where('ward_id', $user->ward_id)->get();
-            $schoolIds = $schools->pluck('id');
-
-            $baseQuery = Attendance::with(['user', 'school'])->whereIn('school_id', $schoolIds);
-
-            if ($request->school_id) $baseQuery->where('school_id', $request->school_id);
-            if ($request->user_id)   $baseQuery->where('user_id', $request->user_id);
-            if ($request->start && $request->end) {
-                $baseQuery->whereBetween('created_at', [
-                    Carbon::parse($request->start)->startOfDay(),
-                    Carbon::parse($request->end)->endOfDay(),
-                ]);
-            }
-
-            $attendances     = (clone $baseQuery)->latest()->paginate(20);
-            $totalSchools    = $schools->count();
-            $totalTeachers   = User::whereIn('school_id', $schoolIds)->where('role', 'teacher')->count();
-            $todayAttendance = (clone $baseQuery)->whereDate('created_at', today())->count();
-            $teachers        = User::whereIn('school_id', $schoolIds)->where('role', 'teacher')->get();
-
-            return view('dashboards.officer', compact(
-                'schools', 'teachers', 'attendances',
-                'totalSchools', 'totalTeachers', 'todayAttendance'
-            ));
-        }
-
-        abort(403, 'Unauthorized role');
     }
 }
