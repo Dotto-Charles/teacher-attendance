@@ -12,14 +12,15 @@
         </p>
 
         <!-- STATUS -->
-        <div id="result" class="text-center text-sm mb-4 text-secondary">
-            Ready to check-in
+        <div id="result" class="text-center mb-4 text-secondary" aria-live="polite" style="font-size: 1rem; line-height: 1.4;">
+            Tayari kwa check-in
         </div>
 
         <!-- BUTTON -->
         <button id="btn"
-                onclick="checkIn()"
-                class="btn btn-primary w-100 py-2">
+                type="button"
+                class="btn btn-primary w-100 py-3"
+                style="font-size: 1.1rem; touch-action: manipulation;">
 
             📍 Check In
         </button>
@@ -29,95 +30,100 @@
 </div>
 
 <script>
+const btn = document.getElementById('btn');
+const result = document.getElementById('result');
+let checking = false;
+const CHECKIN_URL = '{{ route('attendance.check') }}';
+const GPS_TIMEOUT = 20000;
 
-function checkIn() {
+const updateResult = (text, type = 'secondary') => {
+    result.textContent = text;
+    result.className = `text-center text-sm mb-3 text-${type}`;
+};
 
-    const btn = document.getElementById('btn');
-    const result = document.getElementById('result');
-
+const setBusy = (message) => {
+    checking = true;
     btn.disabled = true;
-    btn.innerHTML = "⏳ Getting location...";
-    result.innerHTML = "⏳ Requesting GPS...";
+    btn.innerHTML = `⏳ ${message}`;
+};
 
+const reset = () => {
+    checking = false;
+    btn.disabled = false;
+    btn.innerHTML = '📍 Check In';
+};
+
+const handleGeoError = (err) => {
+    let message = '❌ GPS error. Jaribu tena.';
+    if (err?.code === 1) {
+        message = '❌ Ruhusu eneo kwenye browser.';
+    } else if (err?.code === 2) {
+        message = '❌ Eneo haipatikani. Jaribu tena nje au chukua location mpya.';
+    } else if (err?.code === 3) {
+        message = '❌ GPS imechoka. Jaribu tena.';
+    }
+    updateResult(message, 'danger');
+    btn.innerHTML = '🔄 Jaribu Tena';
+    reset();
+};
+
+const checkIn = async () => {
+    if (checking) return;
     if (!navigator.geolocation) {
-        result.innerHTML = "❌ GPS not supported";
-        reset();
+        updateResult('❌ GPS haipatikani kwenye kifaa hiki.', 'danger');
         return;
     }
 
-    let timeout = setTimeout(() => {
-        result.innerHTML = "⛔ GPS timeout (try again)";
-        reset();
-    }, 10000);
+    setBusy('Inapata eneo...');
+    updateResult('⏳ Inapata eneo kwa GPS...', 'secondary');
 
-    navigator.geolocation.getCurrentPosition(
+    let timeoutHandle;
+    const locationPromise = new Promise((resolve, reject) => {
+        timeoutHandle = setTimeout(() => reject({ code: 3 }), GPS_TIMEOUT);
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: GPS_TIMEOUT,
+            maximumAge: 10000
+        });
+    });
 
-        function (pos) {
+    try {
+        const pos = await locationPromise;
+        clearTimeout(timeoutHandle);
 
-            clearTimeout(timeout);
+        const latitude = pos.coords.latitude;
+        const longitude = pos.coords.longitude;
+        const accuracy = Math.round(pos.coords.accuracy);
 
-            let lat = pos.coords.latitude;
-            let lng = pos.coords.longitude;
+        updateResult(`📍 Eneo limepatikana (±${accuracy}m). Inatumia sasa...`, 'secondary');
 
-            result.innerHTML = "📍 Location received...";
+        const response = await fetch(CHECKIN_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ latitude, longitude, accuracy }),
+            keepalive: true
+        });
 
-            fetch("{{ route('attendance.check') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    latitude: lat,
-                    longitude: lng
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
+        const data = await response.json();
+        const success = data.status === 'success' || data.success === true;
 
-                result.innerHTML = data.message;
-
-                result.className = data.status === 'success'
-                    ? "text-success text-center mb-3"
-                    : "text-danger text-center mb-3";
-
-                reset();
-            })
-            .catch(() => {
-                result.innerHTML = "❌ Server error";
-                reset();
-            });
-        },
-
-        function (err) {
-
-            clearTimeout(timeout);
-
-            if (err.code === 1) {
-                result.innerHTML = "❌ Please allow location permission";
-            } else if (err.code === 2) {
-                result.innerHTML = "❌ Location unavailable";
-            } else {
-                result.innerHTML = "❌ GPS error";
-            }
-
+        updateResult(data.message || (success ? '✅ Attendance imechukuliwa' : '❌ Tatizo limejitokeza'), success ? 'success' : 'danger');
+    } catch (error) {
+        if (error?.code) {
+            handleGeoError(error);
+        } else {
+            updateResult('❌ Tatizo la mtandao au server. Jaribu tena.', 'danger');
+            btn.innerHTML = '🔄 Jaribu Tena';
             reset();
-        },
-
-        {
-            enableHighAccuracy: false,
-            timeout: 8000,
-            maximumAge: 60000
         }
-    );
-}
+    }
+};
 
-function reset() {
-    const btn = document.getElementById('btn');
-    btn.disabled = false;
-    btn.innerHTML = "📍 Check In";
-}
-
+btn.addEventListener('click', checkIn);
 </script>
 
 </x-layout>

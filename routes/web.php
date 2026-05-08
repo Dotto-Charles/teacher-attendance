@@ -18,6 +18,7 @@ use App\Http\Controllers\District\DistrictAssignmentController;
 use App\Http\Controllers\District\DistrictReportController;
 use App\Http\Controllers\Ward\WardOfficerController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -117,6 +118,36 @@ Route::middleware(['auth'])->group(function () {
     })->name('users.search');
 
 });
+
+
+use App\Http\Controllers\HeadTeacher\HeadTeacherController;
+ 
+Route::middleware(['auth', 'role:head_teacher'])
+    ->prefix('headteacher')
+    ->name('headteacher.')
+    ->group(function () {
+ 
+        // Dashboard
+        Route::get('/dashboard',  [HeadTeacherController::class, 'dashboard'])->name('dashboard');
+ 
+        // Teachers
+        Route::get('/teachers',   [HeadTeacherController::class, 'teachers'])->name('teachers');
+ 
+        // Attendance
+        Route::get('/attendance', [HeadTeacherController::class, 'attendance'])->name('attendance');
+ 
+        // Approvals
+        Route::get('/approvals',                      [HeadTeacherController::class, 'approvals'])->name('approvals');
+        Route::patch('/approvals/{user}/approve',     [HeadTeacherController::class, 'approve'])->name('approve');
+        Route::patch('/approvals/{user}/reject',      [HeadTeacherController::class, 'reject'])->name('reject');
+ 
+        // Reports
+        Route::get('/reports',            [HeadTeacherController::class, 'reports'])->name('reports');
+        Route::get('/reports/export/csv', [HeadTeacherController::class, 'exportCsv'])->name('reports.export.csv');
+ 
+        // Check-in (GPS)
+        Route::post('/checkin', [HeadTeacherController::class, 'checkIn'])->name('checkin');
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -270,4 +301,8 @@ Route::middleware(['auth', 'role:ward_officer'])
 
     Route::get('/teachers/{user}/history', [WardOfficerController::class, 'teacherHistory'])
     ->name('teachers.history');
+
+   
+
+Route::get('/wards/{councilId}', [LocationController::class, 'wards']);
     });

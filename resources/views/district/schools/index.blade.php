@@ -177,8 +177,12 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-label">Mwelekeo</div>
-            <a href="{{ route('dashboard') }}" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
-            <a href="#" class="nav-item"><i class="fas fa-calendar-check"></i> Mahudhurio</a>
+            <a href="{{ route('district.dashboard') }}" class="nav-item">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{{ route('district.attendance.index') }}" class="nav-item">
+                <i class="fas fa-calendar-check"></i> Mahudhurio
+            </a>
             <a href="{{ route('district.schools.index') }}" class="nav-item active"><i class="fas fa-school"></i> Shule</a>
             <a href="{{ route('district.teachers.index') }}" class="nav-item">
                 <i class="fas fa-chalkboard-teacher"></i> Walimu
@@ -189,7 +193,7 @@
             <div class="nav-label">Usimamizi</div>
             <a href="#" class="nav-item"><i class="fas fa-map-marker-alt"></i> Kata</a>
             <a href="{{ route('district.assignments.index') }}" class="nav-item"><i class="fas fa-exchange-alt"></i> Uhamisho</a>
-            <a href="#" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
+            <a href="{{ route('district.reports.index') }}" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
         </div>
     </nav>
     <div class="sidebar-footer">

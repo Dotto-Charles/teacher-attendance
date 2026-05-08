@@ -178,7 +178,9 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-label">Mwelekeo</div>
-            <a href="{{ route('dashboard') }}"                  class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="{{ route('district.dashboard') }}" class="nav-item">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
             <a href="{{ route('district.attendance.index') }}"  class="nav-item"><i class="fas fa-calendar-check"></i> Mahudhurio</a>
             <a href="{{ route('district.schools.index') }}"     class="nav-item"><i class="fas fa-school"></i> Shule</a>
             <a href="{{ route('district.teachers.index') }}"    class="nav-item">

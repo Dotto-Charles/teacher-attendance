@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AttendanceController extends Controller
 {
@@ -58,6 +59,19 @@ class AttendanceController extends Controller
                     'message' => '⚠️ Tayari umechukua attendance leo'
                 ]);
             }
+
+
+                    $key = "checkin_attempt:" . Auth::id();
+
+
+ if (RateLimiter::tooManyAttempts($key, 3)) {
+    $seconds = RateLimiter::availableIn($key);
+      return response()->json([
+          'success' => false,
+          'message' => "Umejaribu mara nyingi. Subiri sekunde {$seconds}.",
+ ], 429);
+  }
+ RateLimiter::hit($key, 300);
 
             // 📏 DISTANCE
             $distance = $this->distance(
