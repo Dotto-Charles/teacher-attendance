@@ -11,6 +11,7 @@ use App\Models\Ward;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class WardOfficerController extends Controller
@@ -38,7 +39,7 @@ class WardOfficerController extends Controller
         $selectedDate = $request->get('date', $today->toDateString());
 
         $totalSchools   = $schoolIds->count();
-        $totalTeachers  = User::whereIn('school_id', $schoolIds)->where('role','teacher')->where('status','approved')->count();
+        $totalTeachers  = User::whereIn('school_id', $schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
         $pendingCount   = User::whereIn('school_id', $schoolIds)->where('role','teacher')->where('status','pending')->count();
 
         $presentToday   = Attendance::whereIn('school_id', $schoolIds)
@@ -48,7 +49,7 @@ class WardOfficerController extends Controller
 
         // Per-school attendance for selected date
         $schools = School::where('ward_id', $ward->id)->get()->map(function ($sc) use ($selectedDate) {
-            $total   = User::where('school_id', $sc->id)->where('role','teacher')->where('status','approved')->count();
+            $total   = User::where('school_id', $sc->id)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
             $present = Attendance::where('school_id', $sc->id)->whereDate('created_at', $selectedDate)->distinct('user_id')->count('user_id');
             $rate    = $total > 0 ? round(($present / $total) * 100, 1) : 0;
             return ['id'=>$sc->id,'name'=>$sc->name,'total'=>$total,'present'=>$present,'absent'=>max(0,$total-$present),'rate'=>$rate];
@@ -100,7 +101,7 @@ class WardOfficerController extends Controller
 
         $query = User::with(['school'])
             ->whereIn('school_id', $schoolIds)
-            ->where('role','teacher')->where('status','approved');
+            ->whereIn('role',['teacher','head_teacher'])->where('status','approved');
 
         if ($schoolFilter) $query->where('school_id', $schoolFilter);
         if ($statusFilter === 'present') $query->whereIn('id', $presentIds);
@@ -114,13 +115,13 @@ class WardOfficerController extends Controller
             return $t;
         });
 
-        $allTeachers  = User::whereIn('school_id', $schoolIds)->where('role','teacher')->where('status','approved')->count();
+        $allTeachers  = User::whereIn('school_id', $schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
         $presentCount = $presentIds->count();
         $absentCount  = max(0, $allTeachers - $presentCount);
         $rate         = $allTeachers > 0 ? round(($presentCount / $allTeachers) * 100, 1) : 0;
 
         $absentList = User::with(['school'])->whereIn('school_id', $schoolIds)
-            ->where('role','teacher')->where('status','approved')
+            ->whereIn('role',['teacher','head_teacher'])->where('status','approved')
             ->whereNotIn('id', $presentIds)->when($schoolFilter, fn($q) => $q->where('school_id',$schoolFilter))->get();
 
         $schools = School::where('ward_id', $ward->id)->orderBy('name')->get();
@@ -147,17 +148,22 @@ class WardOfficerController extends Controller
         $search = $request->get('search');
         $today  = Carbon::today()->toDateString();
 
-        $schools = School::where('ward_id', $ward->id)
-            ->when($search, fn($q) => $q->where('name','like',"%$search%"))
-            ->orderBy('name')->get()
-            ->map(function ($sc) use ($today) {
-                $sc->teacher_count   = User::where('school_id',$sc->id)->where('role','teacher')->where('status','approved')->count();
-                $sc->pending_count   = User::where('school_id',$sc->id)->where('role','teacher')->where('status','pending')->count();
-                $sc->present_today   = Attendance::where('school_id',$sc->id)->whereDate('created_at',$today)->distinct('user_id')->count('user_id');
-                $sc->rate_today      = $sc->teacher_count > 0 ? round(($sc->present_today / $sc->teacher_count)*100,1) : 0;
-                $sc->head_teacher    = User::where('school_id',$sc->id)->where('role','head_teacher')->first();
-                return $sc;
-            });
+        $cacheKey = "ward_schools_{$ward->id}_{$search}_{$today}";
+        $ttl = 300; // 5 minutes
+
+        $schools = Cache::remember($cacheKey, $ttl, function () use ($ward, $search, $today) {
+            return School::where('ward_id', $ward->id)
+                ->when($search, fn($q) => $q->where('name','like',"%$search%"))
+                ->orderBy('name')->get()
+                ->map(function ($sc) use ($today) {
+                    $sc->teacher_count   = User::where('school_id',$sc->id)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
+                    $sc->pending_count   = User::where('school_id',$sc->id)->whereIn('role',['teacher','head_teacher'])->where('status','pending')->count();
+                    $sc->present_today   = Attendance::where('school_id',$sc->id)->whereDate('created_at',$today)->distinct('user_id')->count('user_id');
+                    $sc->rate_today      = $sc->teacher_count > 0 ? round(($sc->present_today / $sc->teacher_count)*100,1) : 0;
+                    $sc->head_teacher    = User::where('school_id',$sc->id)->where('role','head_teacher')->first();
+                    return $sc;
+                });
+        });
 
         return view('ward.schools', compact('ward','schools','search'));
     }
@@ -224,9 +230,9 @@ class WardOfficerController extends Controller
         $schoolIds = $this->schoolIds();
         $tab       = $request->get('tab','pending');
 
-        $pending  = User::with('school')->whereIn('school_id',$schoolIds)->where('role','teacher')->where('status','pending')->orderBy('created_at','desc')->get();
-        $approved = User::with('school')->whereIn('school_id',$schoolIds)->where('role','teacher')->where('status','approved')->orderBy('first_name')->get();
-        $rejected = User::with('school')->whereIn('school_id',$schoolIds)->where('role','teacher')->where('status','rejected')->orderBy('first_name')->get();
+        $pending  = User::with('school')->whereIn('school_id',$schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','pending')->orderBy('created_at','desc')->get();
+        $approved = User::with('school')->whereIn('school_id',$schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->orderBy('first_name')->get();
+        $rejected = User::with('school')->whereIn('school_id',$schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','rejected')->orderBy('first_name')->get();
 
         return view('ward.approvals', compact('ward','pending','approved','rejected','tab'));
     }
@@ -323,7 +329,7 @@ class WardOfficerController extends Controller
         // Teachers summary
         $teachers = User::with('school')->whereIn('school_id', $schoolIds)
             ->when($schoolId, fn($q) => $q->where('school_id',$schoolId))
-            ->where('role','teacher')->where('status','approved')->get();
+            ->whereIn('role',['teacher','head_teacher'])->where('status','approved')->get();
 
         $attMap = Attendance::whereIn('school_id', $schoolIds)
             ->whereBetween('created_at',[$from,$to])
@@ -342,7 +348,7 @@ class WardOfficerController extends Controller
         // Per school
         $schoolReport = School::where('ward_id',$ward->id)
             ->when($schoolId, fn($q) => $q->where('id',$schoolId))->get()->map(function ($sc) use ($from,$to,$workDays) {
-            $tc = User::where('school_id',$sc->id)->where('role','teacher')->where('status','approved')->count();
+            $tc = User::where('school_id',$sc->id)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
             $actual = Attendance::where('school_id',$sc->id)->whereBetween('created_at',[$from,$to])->selectRaw('COUNT(DISTINCT DATE(created_at), user_id) as cnt')->value('cnt')??0;
             $rate = ($tc*$workDays)>0 ? round(($actual/($tc*$workDays))*100,1) : 0;
             return ['name'=>$sc->name,'teachers'=>$tc,'rate'=>$rate];
@@ -380,7 +386,7 @@ class WardOfficerController extends Controller
         $workDays = 0; $d = $from->copy();
         while ($d->lte($to)) { if ($d->isWeekday()) $workDays++; $d->addDay(); }
 
-        $teachers = User::with('school')->whereIn('school_id',$schoolIds)->where('role','teacher')->where('status','approved')->orderBy('first_name')->get();
+        $teachers = User::with('school')->whereIn('school_id',$schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->orderBy('first_name')->get();
         $attMap   = Attendance::whereIn('school_id',$schoolIds)->whereBetween('created_at',[$from,$to])->selectRaw('user_id, COUNT(DISTINCT DATE(created_at)) as days')->groupBy('user_id')->pluck('days','user_id');
 
         $rows = [['"Ripoti ya Mahudhurio — Kata ya '.$ward->name.'"',"\"Kipindi: {$dateFrom} — {$dateTo}\""]];
@@ -402,7 +408,7 @@ class WardOfficerController extends Controller
 
     $teachers = User::with('school')
         ->whereIn('school_id', $schoolIds)
-        ->where('role', 'teacher')
+        ->whereIn('role', ['teacher','head_teacher'])
         ->where('status', 'approved')
         ->orderBy('first_name')
         ->get();
@@ -446,7 +452,7 @@ public function schoolShow(Request $request, School $school)
     $today = now()->toDateString();
 
     $teachers = User::where('school_id', $school->id)
-        ->where('role', 'teacher')
+        ->whereIn('role', ['teacher','head_teacher'])
         ->where('status', 'approved')
         ->get();
 
@@ -517,7 +523,7 @@ public function exportSchoolPdf(School $school)
     $today = now()->toDateString();
 
     $teachers = User::where('school_id', $school->id)
-        ->where('role', 'teacher')
+        ->whereIn('role', ['teacher','head_teacher'])
         ->where('status', 'approved')
         ->get();
 

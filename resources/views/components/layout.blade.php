@@ -45,8 +45,11 @@
             display: flex;
             flex-direction: column;
             z-index: 1040;
-            transition: transform .28s cubic-bezier(.4,0,.2,1);
+            transition: transform .28s cubic-bezier(.4,0,.2,1), width .28s cubic-bezier(.4,0,.2,1);
             box-shadow: 4px 0 20px rgba(13,110,253,.15);
+        }
+        .sidebar.collapsed {
+            width: 60px;
         }
 
         .sidebar-header {
@@ -67,6 +70,9 @@
         }
         .brand-text  { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
         .brand-sub   { font-size: 11px; color: rgba(255,255,255,.6); }
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .brand-sub { display: none; }
+        .sidebar.collapsed .brand-icon { margin: 0 auto; }
 
         /* User chip */
         .sidebar-user {
@@ -85,6 +91,9 @@
         }
         .sidebar-uname { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.2; }
         .sidebar-urole { font-size: 10px; color: rgba(255,255,255,.6); }
+        .sidebar.collapsed .sidebar-uname,
+        .sidebar.collapsed .sidebar-urole { display: none; }
+        .sidebar.collapsed .sidebar-user { justify-content: center; padding: 10px; }
 
         /* Nav */
         .sidebar-nav {
@@ -101,6 +110,7 @@
             letter-spacing: 1.1px; text-transform: uppercase;
             padding: 0 10px; margin: 14px 0 5px;
         }
+        .sidebar.collapsed .nav-section-label { display: none; }
         .nav-section-label:first-child { margin-top: 0; }
 
         .sidebar-link {
@@ -114,7 +124,12 @@
             margin-bottom: 2px;
             position: relative;
         }
+        .sidebar.collapsed .sidebar-link {
+            justify-content: center;
+            padding: 9px;
+        }
         .sidebar-link i { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+        .sidebar.collapsed .sidebar-link span { display: none; }
         .sidebar-link:hover { background: rgba(255,255,255,.15); color: #fff; }
         .sidebar-link.active { background: rgba(255,255,255,.22); color: #fff; font-weight: 600; }
         .sidebar-link.active::before {
@@ -122,6 +137,11 @@
             position: absolute; left: 0; top: 20%; bottom: 20%;
             width: 3px; border-radius: 99px;
             background: #fff;
+        }
+        .sidebar.collapsed .sidebar-link.active::before {
+            left: 50%; transform: translateX(-50%);
+            width: 4px; height: 60%;
+            top: 20%;
         }
         .s-badge {
             margin-left: auto;
@@ -147,6 +167,8 @@
             display: flex; align-items: center; justify-content: center; gap: 7px;
             transition: all .18s; font-family: var(--font);
         }
+        .sidebar.collapsed .logout-btn { padding: 9px; }
+        .sidebar.collapsed .logout-btn span { display: none; }
         .logout-btn:hover { background: rgba(239,68,68,.35); color: #fff; }
 
         /* ─── MAIN ────────────────────────────────────────────── */
@@ -155,6 +177,9 @@
             min-height: 100vh;
             display: flex; flex-direction: column;
             transition: margin-left .28s cubic-bezier(.4,0,.2,1);
+        }
+        .sidebar.collapsed + .main-wrap {
+            margin-left: 60px;
         }
 
         /* ─── TOPBAR ──────────────────────────────────────────── */
@@ -177,6 +202,18 @@
             border-radius: 8px; transition: background .15s;
         }
         .hamburger:hover { background: var(--bg); }
+
+        .collapse-btn {
+            display: block;
+            background: none; border: none;
+            color: var(--text); font-size: 18px;
+            cursor: pointer; padding: 4px;
+            border-radius: 8px; transition: background .15s;
+        }
+        .collapse-btn:hover { background: var(--bg); }
+        @media (max-width: 991px) {
+            .collapse-btn { display: none; }
+        }
 
         .page-title-bar { line-height: 1; }
         .page-title-bar .pg-title { font-size: 16px; font-weight: 700; color: var(--text); }
@@ -261,19 +298,19 @@
 
         <a href="{{ route('dashboard') }}"
            class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-house-fill"></i> Dashboard
+            <i class="bi bi-house-fill"></i> <span>Dashboard</span>
         </a>
 
         @if(in_array(auth()->user()->role, ['teacher', 'head_teacher']))
         <a href="{{ route('attendance.index') }}"
            class="sidebar-link {{ request()->routeIs('attendance.index') ? 'active' : '' }}">
-            <i class="bi bi-calendar-check-fill"></i> Mahudhurio
+            <i class="bi bi-calendar-check-fill"></i> <span>Mahudhurio</span>
         </a>
         @endif
 
-        <a href="{{ route('headteacher.reports') }}"
+        <a href="{{ route('attendance.report') }}"
            class="sidebar-link {{ request()->routeIs('attendance.report') ? 'active' : '' }}">
-            <i class="bi bi-bar-chart-fill"></i> Ripoti
+            <i class="bi bi-bar-chart-fill"></i> <span>Ripoti Yako</span>
         </a>
 
         @if(auth()->user()->role === 'teacher')
@@ -282,7 +319,7 @@
         <a href="{{ route('teacher.register.school') }}"
            class="sidebar-link {{ request()->routeIs('teacher.register.*') ? 'active' : '' }}">
             <i class="bi bi-arrow-left-right"></i>
-            {{ auth()->user()->school_id ? 'Hamisha Shule' : 'Jisajili Shule' }}
+            <span>{{ auth()->user()->school_id ? 'Hamisha Shule' : 'Jisajili Shule' }}</span>
         </a>
         @endif
 
@@ -290,12 +327,17 @@
         <div class="nav-section-label">Usimamizi</div>
         <a href="{{ route('headteacher.teachers') }}"
            class="sidebar-link {{ request()->routeIs('headteacher.teachers') ? 'active' : '' }}">
-            <i class="bi bi-people-fill"></i> Walimu
+            <i class="bi bi-people-fill"></i> <span>Walimu</span>
+        </a>
+
+        <a href="{{ route('headteacher.reports') }}"
+           class="sidebar-link {{ request()->routeIs('headteacher.reports') ? 'active' : '' }}">
+            <i class="bi bi-bar-chart-fill"></i> <span>Ripoti ya Walimu</span>
         </a>
 
         <a href="{{ route('headteacher.approvals') }}"
            class="sidebar-link {{ request()->routeIs('approvals.*') ? 'active' : '' }}">
-            <i class="bi bi-check-circle-fill"></i> Idhini za Walimu
+            <i class="bi bi-check-circle-fill"></i> <span>Idhini za Walimu</span>
             @php $pendingCount = \App\Models\User::where('school_id', auth()->user()->school_id)->where('role','teacher')->where('status','pending')->count(); @endphp
             @if($pendingCount > 0)
             <span class="s-badge">{{ $pendingCount }}</span>
@@ -304,7 +346,7 @@
 
         <a href="{{ route('schools.create') }}"
            class="sidebar-link {{ request()->routeIs('schools.*') ? 'active' : '' }}">
-            <i class="bi bi-building-fill-add"></i> Sajili Shule
+            <i class="bi bi-building-fill-add"></i> <span>Sajili Shule</span>
         </a>
         @endif
 
@@ -312,7 +354,7 @@
 
         <a href="{{ route('profile.edit') }}"
            class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
-            <i class="bi bi-person-circle"></i> Wasifu Wangu
+            <i class="bi bi-person-circle"></i> <span>Wasifu Wangu</span>
         </a>
 
     </nav>
@@ -322,7 +364,7 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="logout-btn">
-                <i class="bi bi-box-arrow-right"></i> Toka
+                <i class="bi bi-box-arrow-right"></i> <span>Toka</span>
             </button>
         </form>
     </div>
@@ -336,6 +378,9 @@
         <div class="topbar-left">
             <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
                 <i class="bi bi-list"></i>
+            </button>
+            <button class="collapse-btn" onclick="toggleCollapse()" aria-label="Collapse Sidebar">
+                <i class="bi bi-chevron-left"></i>
             </button>
             <div class="page-title-bar">
                 <div class="pg-title">{{ $title ?? 'Dashboard' }}</div>
@@ -382,6 +427,13 @@ function closeSidebar() {
     document.getElementById('appSidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('show');
     document.body.style.overflow = '';
+}
+function toggleCollapse() {
+    const sidebar = document.getElementById('appSidebar');
+    const btn = document.querySelector('.collapse-btn i');
+    sidebar.classList.toggle('collapsed');
+    btn.classList.toggle('bi-chevron-left');
+    btn.classList.toggle('bi-chevron-right');
 }
 // Close sidebar on resize to desktop
 window.addEventListener('resize', () => {

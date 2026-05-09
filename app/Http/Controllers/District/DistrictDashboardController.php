@@ -22,10 +22,12 @@ class DistrictDashboardController extends Controller
         $selectedDate = $request->get('date', $today->toDateString());
         $selectedWardId = $request->get('ward_id', null);
 
+        $teacherRoles = ['teacher', 'head_teacher'];
+
         // ─── SUMMARY CARDS ───────────────────────────────────────────────
         $totalSchools = School::whereHas('ward', fn($q) => $q->where('council_id', $councilId))->count();
         $totalWards   = Ward::where('council_id', $councilId)->count();
-        $totalTeachers = User::where('role', 'teacher')
+        $totalTeachers = User::whereIn('role', $teacherRoles)
             ->where('status', 'approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
@@ -51,14 +53,15 @@ class DistrictDashboardController extends Controller
 
         $schools = $schoolsQuery->get();
 
-        $schoolAttendance = $schools->map(function ($school) use ($selectedDate) {
-            $teacherCount = User::where('role', 'teacher')
+        $schoolAttendance = $schools->map(function ($school) use ($selectedDate, $teacherRoles) {
+            $teacherCount = User::whereIn('role', $teacherRoles)
                 ->where('status', 'approved')
                 ->where('school_id', $school->id)
                 ->count();
 
             $attended = Attendance::whereDate('created_at', $selectedDate)
                 ->where('school_id', $school->id)
+                ->whereHas('user', fn($q) => $q->whereIn('role', $teacherRoles)->where('status', 'approved'))
                 ->distinct('user_id')
                 ->count('user_id');
 
@@ -80,6 +83,7 @@ class DistrictDashboardController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $attended = Attendance::whereDate('created_at', $date)
+                ->whereHas('user', fn($q) => $q->whereIn('role', $teacherRoles)->where('status', 'approved'))
                 ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
                 ->distinct('user_id')
                 ->count('user_id');
@@ -95,13 +99,14 @@ class DistrictDashboardController extends Controller
         // ─── WARD SUMMARY ────────────────────────────────────────────────
         $wards = Ward::where('council_id', $councilId)->get();
 
-        $wardSummary = $wards->map(function ($ward) use ($selectedDate) {
-            $wardTeachers = User::where('role', 'teacher')
+        $wardSummary = $wards->map(function ($ward) use ($selectedDate, $teacherRoles) {
+            $wardTeachers = User::whereIn('role', $teacherRoles)
                 ->where('status', 'approved')
                 ->whereHas('school', fn($q) => $q->where('ward_id', $ward->id))
                 ->count();
 
             $wardAttended = Attendance::whereDate('created_at', $selectedDate)
+                ->whereHas('user', fn($q) => $q->whereIn('role', $teacherRoles)->where('status', 'approved'))
                 ->whereHas('school', fn($q) => $q->where('ward_id', $ward->id))
                 ->distinct('user_id')
                 ->count('user_id');
@@ -122,7 +127,7 @@ class DistrictDashboardController extends Controller
         $bottomSchools = $schoolAttendance->sortBy('rate')->take(5)->values();
 
         // ─── PENDING APPROVALS (teachers awaiting approval) ──────────────
-        $pendingTeachers = User::where('role', 'teacher')
+        $pendingTeachers = User::whereIn('role', $teacherRoles)
             ->where('status', 'pending')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();

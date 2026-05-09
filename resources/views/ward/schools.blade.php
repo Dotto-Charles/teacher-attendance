@@ -10,7 +10,7 @@
         </div>
 
         {{-- SEARCH --}}
-        <form method="GET" style="display:flex;gap:8px">
+        <form method="GET" style="display:flex;gap:8px" class="search-form">
             <input type="text" name="search" value="{{ $search }}"
                    placeholder="Tafuta shule..."
                    class="form-input"
@@ -61,7 +61,7 @@
     </div>
 
     {{-- SCHOOLS GRID --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px" class="schools-grid">
 
         @forelse($schools as $school)
 
@@ -71,12 +71,12 @@
                     : ($school->rate_today >= 60 ? 'var(--yellow)' : 'var(--red)');
             @endphp
 
-            <div style="background:var(--surface);border-radius:var(--r-md);padding:16px;box-shadow:var(--shadow)">
+            <div style="background:var(--surface);border-radius:var(--r-md);padding:16px;box-shadow:var(--shadow)" class="school-card">
 
                 {{-- NAME + RATE --}}
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
                     <a href="{{ route('ward.schools.show', $school->id) }}"
-                       style="font-size:14px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                       style="font-size:14px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">
                         {{ $school->name }}
                     </a>
 
@@ -129,5 +129,52 @@
         @endforelse
 
     </div>
+
+    <style>
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            
+            /* SCHOOLS GRID - single column on mobile */
+            .schools-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            
+            /* School cards - better padding on mobile */
+            .school-card {
+                padding: 12px !important;
+            }
+            
+            /* Header adjustments */
+            h1 {
+                font-size: 18px !important;
+            }
+            
+            /* Search form - stack on mobile */
+            .search-form {
+                flex-direction: column !important;
+                width: 100% !important;
+            }
+            
+            .search-form input {
+                width: 100% !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Even smaller screens */
+            .school-card {
+                padding: 10px !important;
+            }
+        }
+    </style>
 
 </x-ward-layout>

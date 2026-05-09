@@ -26,9 +26,11 @@ class DistrictTeacherController extends Controller
         $status   = $request->get('status');
         $perPage  = $request->get('per_page', 20);
 
+        $teacherRoles = ['teacher', 'head_teacher'];
+
         // ── QUERY ────────────────────────────────────────────────────────
         $query = User::with(['school.ward'])
-            ->where('role', 'teacher')
+            ->whereIn('role', $teacherRoles)
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId));
 
         if ($search) {
@@ -78,24 +80,25 @@ class DistrictTeacherController extends Controller
         }
 
         // ── SUMMARY STATS ────────────────────────────────────────────────
-        $totalTeachers   = User::where('role','teacher')
+        $totalTeachers   = User::whereIn('role', $teacherRoles)
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
-        $approvedCount   = User::where('role','teacher')->where('status','approved')
+        $approvedCount   = User::whereIn('role', $teacherRoles)->where('status','approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
-        $pendingCount    = User::where('role','teacher')->where('status','pending')
+        $pendingCount    = User::whereIn('role', $teacherRoles)->where('status','pending')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
-        $maleCount       = User::where('role','teacher')->where('sex','male')
+        $maleCount       = User::whereIn('role', $teacherRoles)->where('sex','male')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
-        $femaleCount     = User::where('role','teacher')->where('sex','female')
+        $femaleCount     = User::whereIn('role', $teacherRoles)->where('sex','female')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
 
         // Attended today
         $attendedToday = Attendance::whereDate('created_at', $today)
+            ->whereHas('user', fn($q) => $q->whereIn('role', $teacherRoles)->where('status','approved'))
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->distinct('user_id')
             ->count('user_id');

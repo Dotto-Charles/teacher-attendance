@@ -9,8 +9,6 @@ use App\Models\School;
 
 class LocationController extends Controller
 {
-    use Illuminate\Support\Facades\Cache;
-
 public function wards($councilId)
 {
     return Cache::remember(
@@ -24,8 +22,6 @@ public function wards($councilId)
         }
     );
 }
-
-    use Illuminate\Support\Facades\Cache;
 
 public function schools($wardId)
 {

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HeadTeacherController extends Controller
 {
@@ -401,6 +402,26 @@ class HeadTeacherController extends Controller
             'Content-Type'        => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"ripoti_{$school->name}_{$dateFrom}.csv\"",
         ]);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $school   = $this->school();
+        $dateFrom = $request->get('date_from', today()->startOfMonth()->toDateString());
+        $dateTo   = $request->get('date_to',   today()->toDateString());
+
+        $teacherStats = $this->attService->schoolTeacherStats($school->id, $dateFrom, $dateTo);
+        $workDays     = $this->attService->countWorkDays($dateFrom, $dateTo);
+        $totalTeachers = $teacherStats->count();
+        $overallRate   = $totalTeachers > 0 ? round($teacherStats->avg('rate'), 1) : 0;
+
+        $pdf = Pdf::loadView('headteacher.reports-pdf', compact(
+            'school', 'dateFrom', 'dateTo', 'teacherStats', 'workDays', 'totalTeachers', 'overallRate'
+        ));
+
+        $filename = 'ripoti_'.$school->name.'_'.$dateFrom.'.pdf';
+
+        return $pdf->download(str_replace(' ', '_', $filename));
     }
 
     // ─────────────────────────────────────────────────────────────────

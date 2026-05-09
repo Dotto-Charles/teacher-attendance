@@ -232,7 +232,7 @@
         </div>
         <div class="nav-section">
             <div class="nav-label">Usimamizi</div>
-            <a href="#" class="nav-item"><i class="fas fa-map-marker-alt"></i> Kata</a>
+            <a href="{{ route('district.wards.index') }}" class="nav-item {{ request()->routeIs('district.wards.index') ? 'active' : '' }}"><i class="fas fa-map-marker-alt"></i> Kata</a>
             <a href="{{ route('district.assignments.index') }}" class="nav-item active">
                 <i class="fas fa-exchange-alt"></i> Uhamisho
                 @if($stats['pending_transfers'] > 0)<span class="nav-badge">{{ $stats['pending_transfers'] }}</span>@endif

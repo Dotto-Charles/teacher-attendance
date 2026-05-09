@@ -41,9 +41,10 @@ class DistrictAttendanceController extends Controller
             ->when($selectedWard, fn($q) => $q->where('ward_id', $selectedWard))
             ->orderBy('name')->get();
 
-        // ── Teachers base query ───────────────────────────────────────
+        // ── Teachers + head teachers base query ───────────────────────
+        $teacherRoles = ['teacher', 'head_teacher'];
         $teacherQuery = User::with(['school.ward'])
-            ->where('role', 'teacher')
+            ->whereIn('role', $teacherRoles)
             ->where('status', 'approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId));
 
@@ -84,7 +85,7 @@ class DistrictAttendanceController extends Controller
         });
 
         // ── Summary stats (ALL teachers in council for selected date) ─
-        $allTeachersCount = User::where('role','teacher')->where('status','approved')
+        $allTeachersCount = User::whereIn('role', $teacherRoles)->where('status','approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->count();
 
@@ -103,8 +104,8 @@ class DistrictAttendanceController extends Controller
         if ($selectedWard)   $schoolQuery->where('ward_id', $selectedWard);
         if ($selectedSchool) $schoolQuery->where('id', $selectedSchool);
 
-        $schoolCards = $schoolQuery->get()->map(function ($school) use ($selectedDate) {
-            $total = User::where('school_id', $school->id)->where('role','teacher')->where('status','approved')->count();
+        $schoolCards = $schoolQuery->get()->map(function ($school) use ($selectedDate, $teacherRoles) {
+            $total = User::where('school_id', $school->id)->whereIn('role', $teacherRoles)->where('status','approved')->count();
             $came  = Attendance::where('school_id', $school->id)
                 ->whereDate('created_at', $selectedDate)
                 ->distinct('user_id')->count('user_id');
@@ -122,7 +123,7 @@ class DistrictAttendanceController extends Controller
 
         // ── Absent teachers (full list for export/view) ───────────────
         $absentTeachers = User::with(['school.ward'])
-            ->where('role','teacher')->where('status','approved')
+            ->whereIn('role', $teacherRoles)->where('status','approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->when($selectedWard,    fn($q) => $q->whereHas('school', fn($q2) => $q2->where('ward_id', $selectedWard)))
             ->when($selectedSchool,  fn($q) => $q->where('school_id', $selectedSchool))
@@ -167,6 +168,7 @@ class DistrictAttendanceController extends Controller
         $date      = $request->get('date', Carbon::today()->toDateString());
         $wardId    = $request->get('ward_id');
         $schoolId  = $request->get('school_id');
+        $teacherRoles = ['teacher', 'head_teacher'];
 
         $presentIds = Attendance::whereDate('created_at', $date)
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
@@ -179,7 +181,7 @@ class DistrictAttendanceController extends Controller
             ->pluck('check_in_time', 'user_id');
 
         $teachers = User::with(['school.ward'])
-            ->where('role','teacher')->where('status','approved')
+            ->whereIn('role', $teacherRoles)->where('status','approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->when($wardId,   fn($q) => $q->whereHas('school', fn($q2) => $q2->where('ward_id', $wardId)))
             ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))

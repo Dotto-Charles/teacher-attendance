@@ -91,6 +91,11 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a href="{{ route('attendance.export.pdf', request()->query()) }}" class="btn btn-light border">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Pakua PDF
+            </a>
+        </div>
     </div>
 
     <div class="filter-panel mb-4">

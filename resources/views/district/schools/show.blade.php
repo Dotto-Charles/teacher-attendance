@@ -204,9 +204,9 @@
         </div>
         <div class="nav-section">
             <div class="nav-label">Usimamizi</div>
-            <a href="#" class="nav-item"><i class="fas fa-map-marker-alt"></i> Kata</a>
-            <a href="#" class="nav-item"><i class="fas fa-exchange-alt"></i> Uhamisho</a>
-            <a href="#" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
+            <a href="{{ route('district.wards.index') }}" class="nav-item {{ request()->routeIs('district.wards.index') ? 'active' : '' }}"><i class="fas fa-map-marker-alt"></i> Kata</a>
+            <a href="{{ route('district.assignments.index') }}" class="nav-item"><i class="fas fa-exchange-alt"></i> Uhamisho</a>
+            <a href="{{ route('district.reports.index') }}" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
         </div>
     </nav>
     <div class="sidebar-footer">

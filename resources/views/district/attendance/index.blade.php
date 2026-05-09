@@ -214,9 +214,9 @@
         </div>
         <div class="nav-section">
             <div class="nav-label">Usimamizi</div>
-            <a href="#" class="nav-item"><i class="fas fa-map-marker-alt"></i> Kata</a>
+            <a href="{{ route('district.wards.index') }}" class="nav-item {{ request()->routeIs('district.wards.index') ? 'active' : '' }}"><i class="fas fa-map-marker-alt"></i> Kata</a>
             <a href="{{ route('district.assignments.index') }}" class="nav-item"><i class="fas fa-exchange-alt"></i> Uhamisho</a>
-            <a href="#" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
+            <a href="{{ route('district.reports.index') }}" class="nav-item"><i class="fas fa-file-alt"></i> Ripoti</a>
         </div>
     </nav>
     <div class="sidebar-footer">
@@ -533,7 +533,12 @@
                                         <div class="t-avatar {{ $t->sex==='female'?'female-av':'male-av' }}">{{ $initials }}</div>
                                         <div>
                                             <div class="t-name">{{ $t->first_name }} {{ $t->last_name }}</div>
-                                            <div class="t-check">{{ $t->check_number }}</div>
+                                            <div class="t-check">
+                                                {{ $t->check_number }}
+                                                @if($t->role === 'head_teacher')
+                                                    · <span style="font-size:11px;color:var(--muted)">Mwalimu Mkuu</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

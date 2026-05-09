@@ -195,29 +195,56 @@ class AttendanceController extends Controller
             $query = Attendance::with('user')
                 ->where('school_id', $user->school_id);
         } else {
-            $query = Attendance::where('user_id', $user->id);
+            $query = Attendance::with('user')
+                ->where('user_id', $user->id);
         }
 
-        if ($request->type == 'day') {
-            $query->whereDate('created_at', today());
-        }
-
-        if ($request->type == 'week') {
+        if ($request->start && $request->end) {
             $query->whereBetween('created_at', [
-                now()->startOfWeek(),
-                now()->endOfWeek()
+                Carbon::parse($request->start)->startOfDay(),
+                Carbon::parse($request->end)->endOfDay(),
             ]);
         }
 
-        if ($request->type == 'month') {
-            $query->whereMonth('created_at', now()->month);
+        if ($request->month) {
+            $query->whereMonth('created_at', $request->month);
         }
 
-        $attendances = $query->get();
+        if (!$request->start && !$request->end && !$request->month) {
+            if ($request->type === 'day') {
+                $query->whereDate('created_at', today());
+            }
 
-        $pdf = Pdf::loadView('attendance.pdf', compact('attendances'));
+            if ($request->type === 'week') {
+                $query->whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+            }
 
-        return $pdf->download('attendance.pdf');
+            if ($request->type === 'month') {
+                $query->whereMonth('created_at', now()->month);
+            }
+        }
+
+        $attendances = $query->latest()->get();
+
+        $params = $request->only(['start', 'end', 'month']);
+        $filename = 'ripoti-mahudhurio';
+
+        if (!empty($params['start']) && !empty($params['end'])) {
+            $filename .= '-' . $params['start'] . '-to-' . $params['end'];
+        } elseif (!empty($params['month'])) {
+            $filename .= '-month-' . $params['month'];
+        } else {
+            $filename .= '-' . now()->format('Y-m-d');
+        }
+
+        $filename .= '.pdf';
+
+        $pdf = Pdf::loadView('attendance.pdf', compact('attendances', 'params'));
+
+        return $pdf->download($filename);
     }
 
     private function distance($lat1, $lon1, $lat2, $lon2)

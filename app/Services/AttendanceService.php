@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\DB;
 class AttendanceService
 {
     // ── CACHE TTL ────────────────────────────────────────────────
-    const TTL_TODAY      = 120;
-    const TTL_HISTORICAL = 3600;
-    const TTL_SUMMARY    = 300;
-    const TTL_TEACHERS   = 600;
+    const TTL_TODAY      = 300;  // 5 minutes for today
+    const TTL_HISTORICAL = 3600; // 1 hour for historical
+    const TTL_SUMMARY    = 600;  // 10 minutes for summaries
+    const TTL_TEACHERS   = 900;  // 15 minutes for teacher lists
 
  public function dailyTrend(string $scope, int $id, int $days = 14): Collection
 {
@@ -36,7 +36,7 @@ class AttendanceService
             $query->where('school_id', $id);
 
             $total = User::where('school_id', $id)
-                ->where('role', 'teacher')
+                ->whereIn('role', ['teacher','head_teacher'])
                 ->where('status', 'approved')
                 ->count();
 
@@ -46,7 +46,7 @@ class AttendanceService
             $query->whereIn('school_id', $schoolIds);
 
             $total = User::whereIn('school_id', $schoolIds)
-                ->where('role', 'teacher')
+                ->whereIn('role', ['teacher','head_teacher'])
                 ->where('status', 'approved')
                 ->count();
 
@@ -57,7 +57,7 @@ class AttendanceService
             $query->whereIn('school_id', $schoolIds);
 
             $total = User::whereIn('school_id', $schoolIds)
-                ->where('role', 'teacher')
+                ->whereIn('role', ['teacher','head_teacher'])
                 ->where('status', 'approved')
                 ->count();
         }
@@ -95,7 +95,7 @@ class AttendanceService
         return Cache::remember("att:school:{$schoolId}:{$date}", $ttl, function () use ($schoolId, $date) {
 
             $teacherIds = User::where('school_id', $schoolId)
-                ->where('role', 'teacher')
+                ->whereIn('role', ['teacher','head_teacher'])
                 ->where('status', 'approved')
                 ->pluck('id');
 
@@ -126,7 +126,7 @@ class AttendanceService
             $schoolIds = School::where('ward_id', $wardId)->pluck('id');
 
             $total = User::whereIn('school_id', $schoolIds)
-                ->where('role', 'teacher')
+                ->whereIn('role', ['teacher','head_teacher'])
                 ->where('status', 'approved')
                 ->count();
 

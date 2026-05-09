@@ -39,7 +39,7 @@ class DistrictReportController extends Controller
         $wardsReport      = $reportType === 'wards'      ? $this->buildWardsReport($councilId, $from, $to) : null;
         $transfersReport  = $reportType === 'transfers'  ? $this->buildTransfersReport($councilId, $from, $to) : null;
 
-        $pendingTeachers = User::where('role','teacher')->where('status','pending')
+        $pendingTeachers = User::whereIn('role',['teacher','head_teacher'])->where('status','pending')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))->count();
 
         return view('district.reports.index', compact(
@@ -150,7 +150,8 @@ class DistrictReportController extends Controller
         $d = $from->copy();
         while ($d->lte($to)) { if ($d->isWeekday()) $workingDays++; $d->addDay(); }
 
-        $teachers = User::with(['school.ward'])->where('role','teacher')->where('status','approved')
+        $teacherRoles = ['teacher','head_teacher'];
+        $teachers = User::with(['school.ward'])->whereIn('role',$teacherRoles)->where('status','approved')
             ->whereHas('school.ward', fn($q) => $q->where('council_id', $councilId))
             ->when($wardId,   fn($q) => $q->whereHas('school', fn($q2) => $q2->where('ward_id', $wardId)))
             ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
@@ -204,7 +205,7 @@ class DistrictReportController extends Controller
         while ($d->lte($to)) { if ($d->isWeekday()) $workingDays++; $d->addDay(); }
 
         $rows = $schools->map(function ($sc) use ($from,$to,$workingDays) {
-            $teachers = User::where('school_id',$sc->id)->where('role','teacher')->where('status','approved')->count();
+            $teachers = User::where('school_id',$sc->id)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
             $daysWithData = Attendance::where('school_id',$sc->id)->whereBetween('created_at',[$from,$to])->selectRaw('COUNT(DISTINCT DATE(created_at)) as days')->value('days') ?? 0;
             $avgAttendance = $daysWithData > 0 ? round(Attendance::where('school_id',$sc->id)->whereBetween('created_at',[$from,$to])->selectRaw('DATE(created_at) as d, COUNT(DISTINCT user_id) as cnt')->groupBy('d')->get()->avg('cnt'),1) : 0;
             $expected = $teachers * $workingDays;
@@ -224,7 +225,7 @@ class DistrictReportController extends Controller
 
         $rows = $wards->map(function ($ward) use ($from,$to,$workingDays) {
             $schoolIds = School::where('ward_id',$ward->id)->pluck('id');
-            $teachers  = User::whereIn('school_id',$schoolIds)->where('role','teacher')->where('status','approved')->count();
+            $teachers  = User::whereIn('school_id',$schoolIds)->whereIn('role',['teacher','head_teacher'])->where('status','approved')->count();
             $wo = User::where('role','ward_officer')->where('ward_id',$ward->id)->first();
             $expected = $teachers * $workingDays;
             $actual = Attendance::whereIn('school_id',$schoolIds)->whereBetween('created_at',[$from,$to])->selectRaw('COUNT(DISTINCT DATE(created_at), user_id) as cnt')->value('cnt') ?? 0;

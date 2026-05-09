@@ -16,6 +16,7 @@ use App\Http\Controllers\District\DistrictSchoolController;
 use App\Http\Controllers\District\DistrictAttendanceController;
 use App\Http\Controllers\District\DistrictAssignmentController;
 use App\Http\Controllers\District\DistrictReportController;
+use App\Http\Controllers\District\DistrictWardController;
 use App\Http\Controllers\Ward\WardOfficerController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 
@@ -144,6 +145,7 @@ Route::middleware(['auth', 'role:head_teacher'])
         // Reports
         Route::get('/reports',            [HeadTeacherController::class, 'reports'])->name('reports');
         Route::get('/reports/export/csv', [HeadTeacherController::class, 'exportCsv'])->name('reports.export.csv');
+        Route::get('/reports/export/pdf', [HeadTeacherController::class, 'exportPdf'])->name('reports.export.pdf');
  
         // Check-in (GPS)
         Route::post('/checkin', [HeadTeacherController::class, 'checkIn'])->name('checkin');
@@ -211,6 +213,10 @@ Route::middleware(['auth', 'role:district_officer'])
  
         Route::delete('/assignments/head-teachers/{user}/remove', [DistrictAssignmentController::class, 'removeHeadTeacher'])
             ->name('assignments.remove-head-teacher');
+ 
+        // Ward pages
+        Route::get('/wards', [DistrictWardController::class, 'index'])
+            ->name('wards.index');
  
         // Transfers
         Route::post('/assignments/transfers', [DistrictAssignmentController::class, 'requestTransfer'])

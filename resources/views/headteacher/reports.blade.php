@@ -6,9 +6,14 @@
         <h1 style="font-size:22px;font-weight:800">Ripoti — {{ $school->name }}</h1>
         <p style="font-size:13px;color:#64748b;margin-top:3px">{{ $dateFrom }} — {{ $dateTo }}</p>
     </div>
-    <a href="{{ route('headteacher.reports.export.csv', request()->query()) }}" class="btn btn-success btn-sm rounded-pill">
-        <i class="bi bi-download me-1"></i> Export CSV
-    </a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <a href="{{ route('headteacher.reports.export.csv', request()->query()) }}" class="btn btn-success btn-sm rounded-pill">
+            <i class="bi bi-download me-1"></i> Pakua CSV
+        </a>
+        <a href="{{ route('headteacher.reports.export.pdf', request()->query()) }}" class="btn btn-danger btn-sm rounded-pill">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Pakua PDF
+        </a>
+    </div>
 </div>
 
 {{-- Filter --}}
