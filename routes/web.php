@@ -19,6 +19,7 @@ use App\Http\Controllers\District\DistrictReportController;
 use App\Http\Controllers\District\DistrictWardController;
 use App\Http\Controllers\Ward\WardOfficerController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
+ use App\Http\Controllers\Admin\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,21 @@ use App\Http\Controllers\Teacher\TeacherDashboardController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+/*
+|--------------------------------------------------------------------------
+| CONTACT ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact.index');
+
+Route::post('/contact', function () {
+    // Handle contact form submission
+    // For now, just redirect back with success message
+    return back()->with('success', 'Ujumbe wako umetumwa! Tutawasiliana nawe hivi karibuni.');
+})->name('contact.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -102,9 +118,63 @@ Route::middleware(['auth'])->group(function () {
     /*
     | ADMIN
     */
-    Route::get('/admin/assign-ward-officer', [WardOfficerAssignmentController::class, 'index'])->name('admin.assign.ward');
-    Route::post('/admin/assign-ward-officer', [WardOfficerAssignmentController::class, 'store'])->name('admin.assign.ward.store');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::get('/users', [AdminController::class, 'users'])
+            ->name('users.index');
+
+        Route::get('/users/pending', [AdminController::class, 'pendingUsers'])
+            ->name('users.pending');
+
+        Route::get('/users/roles', [AdminController::class, 'roles'])
+            ->name('users.roles');
+
+        Route::put('/users/{user}/approve', [AdminController::class, 'approve'])
+            ->name('users.approve');
+
+        Route::put('/users/{user}/block', [AdminController::class, 'block'])
+            ->name('users.block');
+
+        Route::put('/users/{user}/role', [AdminController::class, 'changeRole'])
+            ->name('users.role');
+
+        Route::put('/users/{user}', [AdminController::class, 'update'])
+            ->name('users.update');
+
+        Route::delete('/users/{user}', [AdminController::class, 'destroy'])
+            ->name('users.destroy');
+
+        Route::get('/reports', [AdminController::class, 'reports'])
+            ->name('reports');
+
+        Route::get('/activity', [AdminController::class, 'activity'])
+            ->name('activity');
+
+            Route::put('/users/{user}/password', [AdminController::class, 'changePassword'])
+    ->name('users.password');
+
+Route::put('/users/{user}/reset-password', [AdminController::class, 'resetPassword'])
+    ->name('users.reset.password');
+
+    Route::get('/schools', [AdminController::class, 'schools'])
+    ->name('schools.index');
+
+Route::get('/schools/{school}', [AdminController::class, 'showSchool'])
+    ->name('schools.show');
+
+Route::put('/schools/{school}', [AdminController::class, 'updateSchool'])
+    ->name('schools.update');
+
+Route::delete('/schools/{school}', [AdminController::class, 'deleteSchool'])
+    ->name('schools.delete');
+
+});
     /*
     | AJAX HELPER - Schools by Ward
     */

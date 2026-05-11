@@ -5,33 +5,48 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MondoSchoolSeeder extends Seeder
+class KwamtoroSchoolSeeder extends Seeder
 {
     public function run(): void
     {
         $schools = [
             [
-                'name' => 'Mondo Secondary School',
+                'name' => "Kwamtoro  Primary School",
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Mondo Primary School',
+                'name' => "Ndoroboni Primary School",
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Araa Primary School',
+                'name' => 'Banguma Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Waida Primary School',
+                'name' => 'Msera Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Pongai Primary School',
+                'name' => 'Kurio Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Mialo Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Tamka Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Kwamtoro Secondary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
@@ -41,7 +56,7 @@ class MondoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 16, // ✅ MONDO
+                    'ward_id' => 13, // ✅ KWAMTORO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

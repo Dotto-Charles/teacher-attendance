@@ -5,33 +5,38 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MondoSchoolSeeder extends Seeder
+class SoyaSchoolSeeder extends Seeder
 {
     public function run(): void
     {
         $schools = [
             [
-                'name' => 'Mondo Secondary School',
+                'name' => "Chang'ombe  Primary School",
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Mondo Primary School',
+                'name' => "Soya  Primary School",
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Araa Primary School',
+                'name' => 'Magandi Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Waida Primary School',
+                'name' => 'Mbarada Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Pongai Primary School',
+                'name' => 'Mkadinde  Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Soya Secondary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
@@ -41,7 +46,7 @@ class MondoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 16, // ✅ MONDO
+                    'ward_id' => 24, // ✅ SOYA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

@@ -5,33 +5,53 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MondoSchoolSeeder extends Seeder
+class MrijoSchoolSeeder extends Seeder
 {
     public function run(): void
     {
         $schools = [
             [
-                'name' => 'Mondo Secondary School',
+                'name' => 'Mrijo Chini Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Mondo Primary School',
+                'name' => 'Olboloti Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Araa Primary School',
+                'name' => 'Kalolen Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Waida Primary School',
+                'name' => 'Isusumya Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Pongai Primary School',
+                'name' => 'Nkulari Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Magasa Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+             [
+                'name' => "Mrijo Chini 'B' Primary School",
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Mrijo Juu  Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+             [
+                'name' => 'Mrijo Secondary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
@@ -41,7 +61,7 @@ class MondoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 16, // ✅ MONDO
+                    'ward_id' => 18, // ✅ MRIJO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

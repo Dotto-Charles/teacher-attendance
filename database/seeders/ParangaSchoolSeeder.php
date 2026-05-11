@@ -5,33 +5,43 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MondoSchoolSeeder extends Seeder
+class ParangaSchoolSeeder extends Seeder
 {
     public function run(): void
     {
         $schools = [
             [
-                'name' => 'Mondo Secondary School',
+                'name' => 'Paranga Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Mondo Primary School',
+                'name' => 'Kuu Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Araa Primary School',
+                'name' => 'Kelema Balai Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Waida Primary School',
+                'name' => 'Sori Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
-                'name' => 'Pongai Primary School',
+                'name' => 'Paranga Secondary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Isini Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+             [
+                'name' => 'Cheku Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
@@ -41,7 +51,7 @@ class MondoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 16, // ✅ MONDO
+                    'ward_id' => 21, // ✅ PARANGA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

@@ -26,12 +26,32 @@ class DalaiSchoolSeeder extends Seeder
                 'longitude' => null,
             ],
             [
+                'name' => 'Tandala B Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Taqwa Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
+                'name' => 'Piho Primary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+            [
                 'name' => 'Kelema Maziwani Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
             [
                 'name' => 'Kelema Maziwani Secondary School',
+                'latitude' => null,
+                'longitude' => null,
+            ],
+             [
+                'name' => 'Mtakuja Primary School',
                 'latitude' => null,
                 'longitude' => null,
             ],
@@ -42,11 +62,11 @@ class DalaiSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 4, // Dalai Ward
+                    'ward_id' => 5, // Dalai Ward
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],
-                    'radius' => 500,
+                    'radius' => 50,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]

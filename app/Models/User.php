@@ -23,6 +23,8 @@ use Illuminate\Notifications\Notifiable;
     'school_id',
     'ward_id',
     'council_id',
+    'is_admin',
+    'approved_at',
 ])]
 #[Hidden([
     'password',
@@ -142,4 +144,11 @@ class User extends Authenticatable
     {
         return 'check_number';
     }
+
+    public function isAdmin()
+{
+    return $this->is_admin == true;
+}
+
+
 }

@@ -21,9 +21,21 @@ class DatabaseSeeder extends Seeder
         WardSeeder::class,
         DalaiSchoolSeeder::class,
         MondoSchoolSeeder::class,
+        SongoloSchoolSeeder::class,
+        SoyaSchoolSeeder::class,
+        TumbakoseSchoolSeeder::class,
+        SanzawaSchoolSeeder::class,
+        ParangaSchoolSeeder::class,
+        OvadaSchoolSeeder::class,
+        MsaadaSchoolSeeder::class,
+        MrijoSchoolSeeder::class,
+        MpendoSchoolSeeder::class,
+        MakorongoSchoolSeeder::class,
+        LaltaSchoolSeeder::class,
+        KwamtoroSchoolSeeder::class,
+        KinyamsindoSchoolSeeder::class,
         UserSeeder::class, 
 
-         
     ]);
 }
 

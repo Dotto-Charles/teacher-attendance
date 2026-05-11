@@ -181,8 +181,8 @@ class DashboardController extends Controller
         }
 
         // ── ADMIN ─────────────────────────────────────────────────────
-        if ($user->role === 'admin') {
-            return redirect()->route('dashboard');
+          if ($user->is_admin) {
+            return redirect()->route('admin.dashboard');
         }
 
         abort(403, 'Unauthorized role');

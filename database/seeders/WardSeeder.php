@@ -10,6 +10,7 @@ class WardSeeder extends Seeder
     public function run(): void
     {
         $wards = [
+            'Babayu',
             'Chandama',
             'Chemba',
             'Churuku',
@@ -23,6 +24,7 @@ class WardSeeder extends Seeder
             'Kinyamsindo',
             'Kwamtoro',
             'Lalta',
+            'Lahoda',
             'Makorongo',
             'Mondo',
             'Mpendo',
@@ -31,7 +33,7 @@ class WardSeeder extends Seeder
             'Ovada',
             'Paranga',
             'Sanzawa',
-            'Songoro',
+            'Songolo',
             'Soya',
             'Tumbakose'
         ];
