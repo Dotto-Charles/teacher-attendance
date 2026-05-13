@@ -41,7 +41,7 @@ class LaltaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 14, // ✅ LALTA
+                    'ward_id' => 15, // ✅ LALTA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

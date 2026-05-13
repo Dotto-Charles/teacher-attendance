@@ -42,7 +42,7 @@ class MsaadaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 19, // ✅ MSAADA
+                    'ward_id' => 20, // ✅ MSAADA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

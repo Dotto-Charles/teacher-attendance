@@ -382,3 +382,7 @@ Route::middleware(['auth', 'role:ward_officer'])
 
 Route::get('/wards/{councilId}', [LocationController::class, 'wards']);
     });
+
+    Route::get('/about-developer', function () {
+    return view('about-developer');
+});

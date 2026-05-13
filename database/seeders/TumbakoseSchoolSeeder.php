@@ -32,7 +32,7 @@ class TumbakoseSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 25, // ✅ TUMBAKOSE
+                    'ward_id' => 26, // ✅ TUMBAKOSE
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

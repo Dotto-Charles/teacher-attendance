@@ -36,7 +36,7 @@ class MakorongoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 15, // ✅ MAKORONGO
+                    'ward_id' => 16, // ✅ MAKORONGO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

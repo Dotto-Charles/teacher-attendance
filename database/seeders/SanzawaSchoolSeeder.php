@@ -46,7 +46,7 @@ class SanzawaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 22, // ✅ SANZAWA
+                    'ward_id' => 23, // ✅ SANZAWA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

@@ -42,7 +42,7 @@ class OvadaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 20, // ✅ OVADA
+                    'ward_id' => 21, // ✅ OVADA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

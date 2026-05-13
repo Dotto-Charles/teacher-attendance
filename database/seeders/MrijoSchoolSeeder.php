@@ -61,7 +61,7 @@ class MrijoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 18, // ✅ MRIJO
+                    'ward_id' => 19, // ✅ MRIJO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

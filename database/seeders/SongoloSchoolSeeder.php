@@ -41,7 +41,7 @@ class SongoloSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 23, // ✅ SONGOLO
+                    'ward_id' => 24, // ✅ SONGOLO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

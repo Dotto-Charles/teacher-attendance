@@ -51,7 +51,7 @@ class ParangaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 21, // ✅ PARANGA
+                    'ward_id' => 22, // ✅ PARANGA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

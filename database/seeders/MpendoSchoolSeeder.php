@@ -41,7 +41,7 @@ class MpendoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 17, // ✅ MPENDO
+                    'ward_id' => 18, // ✅ MPENDO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

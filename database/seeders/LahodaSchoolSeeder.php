@@ -41,7 +41,7 @@ class LahodaSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 15, // ✅ LAHODA
+                    'ward_id' => 14, // ✅ LAHODA
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],

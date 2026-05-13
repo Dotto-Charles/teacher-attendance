@@ -2,21 +2,37 @@
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduAttend | Mfumo wa Mahudhurio</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>
+        EduAttend | Mfumo wa Mahudhurio
+    </title>
+
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- ICONS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+          rel="stylesheet">
 
     <style>
+
         :root{
-            --bg:#0b1220;
-            --surface:rgba(255,255,255,0.05);
-            --border:rgba(255,255,255,0.08);
-            --text:#ffffff;
-            --text2:#cbd5e1;
-            --primary:#2563eb;
-            --primary2:#3b82f6;
-            --font:'Space Grotesk',sans-serif;
+            --primary:#005bac;
+            --primary2:#0d6efd;
+            --secondary:#0b2239;
+            --gold:#f4b400;
+            --white:#ffffff;
+            --text:#0f172a;
+            --muted:#64748b;
+            --bg:#f1f5f9;
+            --border:#dbe4ef;
         }
 
         *{
@@ -25,11 +41,16 @@
             box-sizing:border-box;
         }
 
+        html{
+            scroll-behavior:smooth;
+        }
+
         body{
-            font-family:var(--font);
-            background:#000;
+            font-family:'Inter',sans-serif;
+            background:var(--bg);
             color:var(--text);
             overflow-x:hidden;
+            position:relative;
         }
 
         a{
@@ -37,43 +58,96 @@
             color:inherit;
         }
 
-        /* ===== BACKGROUND ===== */
-        .bg-image{
+        /* ================= WATERMARK ================= */
+
+        .watermark{
             position:fixed;
             inset:0;
             background:
-                linear-gradient(rgba(7,10,20,.82), rgba(7,10,20,.88)),
-                url('/mnt/data/ppppppp.jpg');
-            background-size:cover;
-            background-position:center;
-            filter:blur(2px);
-            transform:scale(1.05);
-            z-index:-2;
+                url('{{ asset('images/ppppppp.jpg') }}')
+                center center no-repeat;
+
+            background-size:450px;
+
+            opacity:.04;
+
+            pointer-events:none;
+
+            z-index:0;
         }
 
-        .bg-overlay{
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,.35);
-            z-index:-1;
+        /* ================= TOPBAR ================= */
+
+        .topbar{
+            background:
+                linear-gradient(
+                90deg,
+                var(--secondary),
+                var(--primary)
+                );
+
+            color:white;
+
+            padding:14px 20px;
+
+            position:relative;
+
+            z-index:10;
+
+            box-shadow:
+                0 2px 10px rgba(0,0,0,.08);
         }
 
-        /* ===== NAVBAR ===== */
-        .navbar{
-            position:fixed;
+        .topbar-inner{
+            max-width:1250px;
+            margin:auto;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:15px;
+
+            text-align:center;
+        }
+
+        .topbar img{
+            width:60px;
+            height:60px;
+            border-radius:50%;
+            background:white;
+            object-fit:cover;
+            padding:3px;
+        }
+
+        .topbar h2{
+            margin:0;
+            font-size:24px;
+            font-weight:800;
+            line-height:1.2;
+        }
+
+        .topbar p{
+            margin:0;
+            font-size:13px;
+            opacity:.9;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar-custom{
+            background:white;
+            position:sticky;
             top:0;
-            left:0;
-            right:0;
-            z-index:100;
-            backdrop-filter:blur(14px);
-            background:rgba(5,10,20,.55);
-            border-bottom:1px solid var(--border);
+            z-index:99;
+            border-bottom:1px solid #e2e8f0;
         }
 
         .nav-inner{
-            max-width:1150px;
+            max-width:1250px;
             margin:auto;
-            padding:16px 20px;
+
+            padding:16px 22px;
+
             display:flex;
             align-items:center;
             justify-content:space-between;
@@ -82,286 +156,703 @@
         .brand{
             display:flex;
             align-items:center;
-            gap:12px;
+            gap:14px;
         }
 
         .brand img{
-            width:44px;
-            height:44px;
+            width:52px;
+            height:52px;
             border-radius:50%;
             object-fit:cover;
-            border:2px solid rgba(255,255,255,.12);
-            background:#fff;
+            background:white;
+            border:2px solid #dbeafe;
         }
 
-        .brand-text h2{
-            font-size:18px;
-            font-weight:700;
-            line-height:1;
+        .brand-text h3{
+            margin:0;
+            font-size:20px;
+            font-weight:800;
+            color:var(--secondary);
         }
 
         .brand-text span{
-            font-size:11px;
-            color:var(--text2);
+            font-size:12px;
+            color:var(--muted);
         }
 
         .nav-links{
             display:flex;
             align-items:center;
-            gap:10px;
+            gap:12px;
+            flex-wrap:wrap;
         }
 
         .nav-link{
-            padding:10px 14px;
-            border-radius:8px;
+            color:#334155;
             font-size:14px;
-            color:var(--text2);
-            transition:.2s;
+            font-weight:600;
+            padding:10px 14px;
+            border-radius:10px;
+            transition:.3s;
         }
 
         .nav-link:hover{
-            background:rgba(255,255,255,.06);
-            color:#fff;
+            background:#f1f5f9;
+            color:var(--primary);
         }
 
-        .btn{
-            padding:11px 18px;
-            border-radius:10px;
+        /* ================= BUTTONS ================= */
+
+        .btn-custom{
+            padding:12px 22px;
+            border-radius:12px;
             font-size:14px;
-            font-weight:600;
-            transition:.2s;
+            font-weight:700;
+            transition:.3s;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
         }
 
         .btn-login{
-            background:rgba(255,255,255,.06);
-            border:1px solid rgba(255,255,255,.08);
-            color:#fff;
+            background:#eff6ff;
+            color:var(--primary);
+            border:1px solid #bfdbfe;
         }
 
         .btn-login:hover{
-            background:rgba(255,255,255,.1);
+            background:#dbeafe;
+            color:var(--primary);
         }
 
-        .btn-primary{
-            background:linear-gradient(135deg,var(--primary),var(--primary2));
+        .btn-primary-custom{
+            background:
+                linear-gradient(
+                135deg,
+                var(--primary),
+                var(--primary2)
+                );
+
             color:white;
-            box-shadow:0 10px 25px rgba(37,99,235,.3);
+
+            border:none;
+
+            box-shadow:
+                0 10px 20px rgba(0,91,172,.15);
         }
 
-        .btn-primary:hover{
+        .btn-primary-custom:hover{
             transform:translateY(-2px);
+            color:white;
         }
 
-        /* ===== HERO ===== */
+        /* ================= HERO ================= */
+
         .hero{
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            text-align:center;
-            padding:130px 20px 80px;
+            position:relative;
+            z-index:2;
+
+            padding:
+                90px 20px 100px;
         }
 
-        .hero-content{
-            max-width:760px;
+        .hero-container{
+            max-width:1250px;
+            margin:auto;
+
+            display:grid;
+            grid-template-columns:1.1fr .9fr;
+            gap:40px;
+            align-items:center;
         }
 
         .hero-badge{
             display:inline-flex;
             align-items:center;
-            gap:8px;
-            background:rgba(255,255,255,.06);
-            border:1px solid rgba(255,255,255,.08);
-            padding:8px 16px;
+            gap:10px;
+
+            padding:10px 18px;
+
+            background:#dbeafe;
+
+            color:#1e40af;
+
             border-radius:999px;
-            margin-bottom:24px;
+
             font-size:13px;
-            color:#dbeafe;
+            font-weight:700;
+
+            margin-bottom:24px;
         }
 
         .dot{
-            width:8px;
-            height:8px;
+            width:10px;
+            height:10px;
             border-radius:50%;
             background:#22c55e;
         }
 
         .hero h1{
-            font-size:clamp(36px,6vw,68px);
-            line-height:1.1;
-            margin-bottom:22px;
+            font-size:clamp(40px,7vw,72px);
+            line-height:1.05;
+            margin-bottom:24px;
+            color:var(--secondary);
             font-weight:800;
         }
 
         .highlight{
-            background:linear-gradient(135deg,#60a5fa,#93c5fd);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
+            color:var(--primary);
         }
 
         .hero p{
             font-size:18px;
-            line-height:1.8;
-            color:var(--text2);
+            line-height:1.9;
+            color:var(--muted);
             margin-bottom:35px;
+            max-width:700px;
         }
 
         .hero-buttons{
             display:flex;
-            justify-content:center;
-            gap:14px;
+            gap:16px;
             flex-wrap:wrap;
         }
 
-        /* ===== ABOUT ===== */
+        /* ================= HERO CARD ================= */
+
+        .hero-card{
+            background:white;
+
+            border-radius:28px;
+
+            padding:35px;
+
+            border:1px solid #e2e8f0;
+
+            box-shadow:
+                0 20px 40px rgba(15,23,42,.06);
+        }
+
+        .hero-card img{
+            width:100%;
+            border-radius:20px;
+            object-fit:cover;
+        }
+
+        .hero-card-content{
+            margin-top:24px;
+        }
+
+        .hero-card-content h4{
+            font-weight:800;
+            color:var(--secondary);
+            margin-bottom:14px;
+        }
+
+        .hero-card-content p{
+            margin:0;
+            color:var(--muted);
+            font-size:15px;
+            line-height:1.8;
+        }
+
+        /* ================= FEATURES ================= */
+
+        .features{
+            padding:0 20px 100px;
+            position:relative;
+            z-index:2;
+        }
+
+        .section-title{
+            text-align:center;
+            margin-bottom:55px;
+        }
+
+        .section-title h2{
+            font-size:42px;
+            font-weight:800;
+            color:var(--secondary);
+            margin-bottom:15px;
+        }
+
+        .section-title p{
+            color:var(--muted);
+            max-width:700px;
+            margin:auto;
+            line-height:1.8;
+        }
+
+        .features-grid{
+            max-width:1200px;
+            margin:auto;
+
+            display:grid;
+            grid-template-columns:
+                repeat(auto-fit,minmax(280px,1fr));
+
+            gap:25px;
+        }
+
+        .feature-card{
+            background:white;
+            border-radius:24px;
+            padding:35px 30px;
+            border:1px solid #e2e8f0;
+            transition:.3s;
+
+            box-shadow:
+                0 10px 30px rgba(15,23,42,.04);
+        }
+
+        .feature-card:hover{
+            transform:translateY(-8px);
+        }
+
+        .feature-icon{
+            width:70px;
+            height:70px;
+            border-radius:18px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            background:#eff6ff;
+
+            color:var(--primary);
+
+            font-size:30px;
+
+            margin-bottom:22px;
+        }
+
+        .feature-card h3{
+            font-size:22px;
+            color:var(--secondary);
+            margin-bottom:14px;
+            font-weight:700;
+        }
+
+        .feature-card p{
+            color:var(--muted);
+            line-height:1.8;
+            font-size:15px;
+        }
+
+        /* ================= ABOUT ================= */
+
         .about{
-            padding:90px 20px;
+            padding:0 20px 100px;
+            position:relative;
+            z-index:2;
         }
 
         .about-card{
-            max-width:1000px;
+            max-width:1200px;
             margin:auto;
-            background:rgba(10,15,25,.72);
-            border:1px solid rgba(255,255,255,.08);
-            border-radius:24px;
-            backdrop-filter:blur(12px);
-            padding:50px 35px;
-            text-align:center;
+
+            background:white;
+
+            border-radius:30px;
+
+            padding:60px 45px;
+
+            border:1px solid #e2e8f0;
+
+            box-shadow:
+                0 15px 40px rgba(15,23,42,.05);
         }
 
-        .about-card h2{
-            font-size:38px;
-            margin-bottom:18px;
+        .about-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+            align-items:center;
         }
 
-        .about-card p{
-            color:var(--text2);
+        .about img{
+            width:100%;
+            border-radius:22px;
+        }
+
+        .about-content h2{
+            font-size:42px;
+            font-weight:800;
+            color:var(--secondary);
+            margin-bottom:20px;
+        }
+
+        .about-content p{
+            color:var(--muted);
             line-height:1.9;
-            max-width:760px;
-            margin:auto;
-            font-size:16px;
+            margin-bottom:20px;
         }
 
-        /* ===== FOOTER ===== */
+        .about-list{
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+
+        .about-item{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            font-weight:600;
+            color:#334155;
+        }
+
+        .about-item i{
+            color:#16a34a;
+            font-size:18px;
+        }
+
+        /* ================= FOOTER ================= */
+
         footer{
-            border-top:1px solid rgba(255,255,255,.08);
-            padding:30px 20px;
+            background:var(--secondary);
+            color:white;
+            padding:40px 20px;
             text-align:center;
-            color:#94a3b8;
-            font-size:13px;
-            background:rgba(0,0,0,.35);
-            backdrop-filter:blur(10px);
+            position:relative;
+            z-index:2;
         }
 
-        /* ===== MOBILE ===== */
+        footer p{
+            margin:0;
+            opacity:.9;
+            line-height:1.8;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media(max-width:992px){
+
+            .hero-container,
+            .about-grid{
+                grid-template-columns:1fr;
+            }
+
+            .hero{
+                padding-top:70px;
+            }
+
+            .hero-card{
+                order:-1;
+            }
+        }
+
         @media(max-width:768px){
 
+            .topbar-inner,
             .nav-inner{
                 flex-direction:column;
                 gap:16px;
+                text-align:center;
             }
 
-            .nav-links{
-                flex-wrap:wrap;
-                justify-content:center;
+            .hero-buttons{
+                flex-direction:column;
+            }
+
+            .btn-custom{
+                width:100%;
+            }
+
+            .hero h1{
+                font-size:42px;
             }
 
             .hero p{
                 font-size:16px;
             }
 
-            .about-card{
-                padding:35px 24px;
+            .section-title h2,
+            .about-content h2{
+                font-size:32px;
             }
 
-            .about-card h2{
-                font-size:30px;
+            .about-card{
+                padding:35px 22px;
+            }
+
+            .hero-card{
+                padding:22px;
+            }
+
+            .watermark{
+                background-size:260px;
             }
         }
 
     </style>
+
 </head>
 
 <body>
 
-    <!-- BACKGROUND -->
-    <div class="bg-image"></div>
-    <div class="bg-overlay"></div>
+    <!-- WATERMARK -->
+    <div class="watermark"></div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+        <div class="topbar-inner">
+
+            <img src="{{ asset('images/ppppppp.jpg') }}"
+                 alt="Logo">
+
+            <div>
+                <h2>
+                    Chemba District Council
+                </h2>
+
+                <p>
+                    Mfumo wa Usimamizi wa Mahudhurio ya Walimu
+                </p>
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- NAVBAR -->
-    <nav class="navbar">
+    <nav class="navbar-custom">
+
         <div class="nav-inner">
 
             <div class="brand">
-                <img src="/mnt/data/ppppppp.jpg" alt="Chemba Logo">
+
+                <img src="{{ asset('images/ppppppp.jpg') }}"
+                     alt="Logo">
 
                 <div class="brand-text">
-                    <h2>EduAttend</h2>
-                    <span>Attendance Management System</span>
+
+                    <h3>EduAttend</h3>
+
+                    <span>
+                        Attendance Management System
+                    </span>
+
                 </div>
+
             </div>
 
             <div class="nav-links">
 
-                <a href="#about" class="nav-link">About Us</a>
+            <a href="{{ url('/about-developer') }}" class="nav-link">
+                         Kuhusu Mtengenezaji
+              </a>
+
+                <a href="#features"
+                   class="nav-link">
+
+                    Huduma
+
+                </a>
 
                 @guest
-                    <a href="{{ route('login') }}" class="btn btn-login">
+
+                    <a href="{{ route('login') }}"
+                       class="btn-custom btn-login">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+
                         Ingia
+
                     </a>
 
-                    <a href="{{ route('register') }}" class="btn btn-primary">
+                    <a href="{{ route('register') }}"
+                       class="btn-custom btn-primary-custom">
+
+                        <i class="bi bi-person-plus"></i>
+
                         Jiandikishe
+
                     </a>
+
                 @else
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary">
+
+                    <a href="{{ route('dashboard') }}"
+                       class="btn-custom btn-primary-custom">
+
                         Dashboard
+
                     </a>
+
                 @endguest
 
             </div>
 
         </div>
+
     </nav>
 
     <!-- HERO -->
     <section class="hero">
 
-        <div class="hero-content">
+        <div class="hero-container">
 
-            <div class="hero-badge">
-                <div class="dot"></div>
-                Mfumo wa Mahudhurio · Chemba District
+            <!-- LEFT -->
+            <div>
+
+                <div class="hero-badge">
+
+                    <div class="dot"></div>
+
+                    Mfumo wa Mahudhurio 
+
+                </div>
+
+                <h1>
+
+                    Mfumo wa Kisasa wa
+
+                    <span class="highlight">
+                        Mahudhurio ya Walimu
+                    </span>
+
+                </h1>
+
+                <p>
+
+                    Mfumo rasmi wa Chemba District Council unaorahisisha
+                    usimamizi wa mahudhurio ya walimu kwa kutumia GPS,
+                    taarifa za muda halisi na ripoti za kisasa kwa viongozi
+                    wa elimu na wasimamizi wa shule.
+
+                </p>
+
+                <div class="hero-buttons">
+
+                    @guest
+
+                        <a href="{{ route('login') }}"
+                           class="btn-custom btn-primary-custom">
+
+                            <i class="bi bi-box-arrow-in-right"></i>
+
+                            Ingia Mfumo
+
+                        </a>
+
+                        <a href="{{ route('register') }}"
+                           class="btn-custom btn-login">
+
+                            <i class="bi bi-person-plus"></i>
+
+                            Fungua Akaunti
+
+                        </a>
+
+                    @else
+
+                        <a href="{{ route('dashboard') }}"
+                           class="btn-custom btn-primary-custom">
+
+                            Dashboard
+
+                        </a>
+
+                    @endguest
+
+                </div>
+
             </div>
 
-            <h1>
-                Mfumo wa Kisasa wa
-                <span class="highlight">
-                    Mahudhurio ya Walimu
-                </span>
-            </h1>
+            <!-- RIGHT -->
+            <div class="hero-card">
+
+                <img src="{{ asset('images/ppppppp.jpg') }}"
+                     alt="System">
+
+                <div class="hero-card-content">
+
+                    <h4>
+                        Mfumo wa Mahudhurio
+                    </h4>
+
+                    <p>
+
+                        Mfumo huu umeundwa kwa ajili ya kuboresha usimamizi
+                        wa mahudhurio ya walimu katika shule zote za
+                        halmashauri kwa usalama, uwazi na ufanisi zaidi.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features"
+             id="features">
+
+        <div class="section-title">
+
+            <h2>
+                Huduma za Mfumo
+            </h2>
 
             <p>
-                Mfumo wa kisasa unaorahisisha usimamizi wa mahudhurio ya walimu
-                kwa kutumia GPS, taarifa za haraka, na ufuatiliaji wa uhakika
-                kwa shule zote za halmashauri.
+
+                Mfumo wa EduAttend umeboreshwa kwa teknolojia za kisasa
+                ili kusaidia usimamizi wa elimu kwa ufanisi mkubwa.
+
             </p>
 
-            <div class="hero-buttons">
+        </div>
 
-                @guest
-                    <a href="{{ route('login') }}" class="btn btn-primary">
-                        Ingia Mfumo
-                    </a>
+        <div class="features-grid">
 
-                    <a href="{{ route('register') }}" class="btn btn-login">
-                        Fungua Akaunti
-                    </a>
-                @else
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary">
-                        Nenda Dashboard
-                    </a>
-                @endguest
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+
+                <h3>GPS Tracking</h3>
+
+                <p>
+                    Hakiki mahudhurio ya walimu kwa kutumia eneo halisi
+                    la shule kwa usahihi mkubwa.
+                </p>
+
+            </div>
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    <i class="bi bi-bar-chart"></i>
+                </div>
+
+                <h3>Ripoti za Muda Halisi</h3>
+
+                <p>
+                    Pata taarifa za mahudhurio kwa muda halisi kutoka
+                    shule zote ndani ya halmashauri.
+                </p>
+
+            </div>
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+
+                <h3>Usalama wa Taarifa</h3>
+
+                <p>
+                    Mfumo umezingatia viwango vya juu vya usalama
+                    wa taarifa za watumiaji.
+                </p>
 
             </div>
 
@@ -370,19 +861,66 @@
     </section>
 
     <!-- ABOUT -->
-    <section class="about" id="about">
+    <section class="about"
+             id="about">
 
         <div class="about-card">
 
-            <h2>About Us</h2>
+            <div class="about-grid">
 
-            <p>
-                EduAttend ni mfumo wa kisasa ulioundwa kusaidia shule na
-                halmashauri kusimamia mahudhurio ya walimu kwa njia rahisi,
-                salama na ya kisasa. Mfumo huu unawezesha ufuatiliaji wa
-                mahudhurio kwa kutumia GPS pamoja na taarifa za muda halisi
-                kwa viongozi wa elimu na wasimamizi wa shule.
-            </p>
+                <div>
+
+                    <img src="{{ asset('images/ppppppp.jpg') }}"
+                         alt="About">
+
+                </div>
+
+                <div class="about-content">
+
+                    <h2>
+                        Kuhusu EduAttend
+                    </h2>
+
+                    <p>
+
+                        EduAttend ni mfumo wa kisasa uliotengenezwa kusaidia
+                        shule na halmashauri kusimamia mahudhurio ya walimu
+                        kwa njia rahisi, salama na yenye uwazi.
+
+                    </p>
+
+                    <p>
+
+                        Mfumo huu unawezesha viongozi wa elimu kufuatilia
+                        taarifa za mahudhurio kwa wakati halisi pamoja na
+                        kupata ripoti sahihi kwa ajili ya maamuzi ya kiutawala.
+
+                    </p>
+
+                    <div class="about-list">
+
+
+                        <div class="about-item">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Mahudhurio kwa GPS
+
+                        </div>
+
+                        <div class="about-item">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Ripoti za muda halisi
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -390,7 +928,18 @@
 
     <!-- FOOTER -->
     <footer>
-        © {{ date('Y') }} EduAttend · Chemba District Council · Tanzania
+
+        <p>
+
+            © {{ date('Y') }}
+            Chemba District Council · Tanzania
+
+            <br>
+
+            Teacher Attendance Management System
+
+        </p>
+
     </footer>
 
 </body>

@@ -41,7 +41,7 @@ class MondoSchoolSeeder extends Seeder
             DB::table('schools')->updateOrInsert(
                 ['name' => $school['name']],
                 [
-                    'ward_id' => 16, // ✅ MONDO
+                    'ward_id' => 17, // ✅ MONDO
                     'code' => null,
                     'latitude' => $school['latitude'],
                     'longitude' => $school['longitude'],
